@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+        
+{% block prebody %}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#add-parameter-point-btn').click(function(){
+        $('#themodal').modal()
+    })
+    $('#request-id-modal').hide()
+    $('#drophtml').hide()
+
+
+    $('#upload-response-btn').click(function(){
+        url = location.origin+'/recast/updateResponse/{{request_info['uuid']}}'
+        $.ajax(url,{
+            async: false,
+            complete: function(data){
+               $('#upload-modal').modal()
+            }
+        })
+
+    })
+
+    var requestResultsAvailable = false
+    $.ajax(location.origin+'/status/{{request_info['uuid']}}',{
+        async: false,
+        complete: function(data){
+            requestResultsAvailable = data['responseJSON']['resultsAvailable']
+            if(!requestResultsAvailable){
+                $('#upload-response-btn').addClass('disabled')
+            }                    
+        }
+    })
+
+
+    $('.process-btn').each(function(){
+        var button = $(this)
+        var analysisImplemented = false
+        $.ajax(location.origin+'/recast/analysis_status/{{request_info['analysis-uuid']}}',{
+            async: false,
+            complete: function(data){
+                analysisImplemented = data['responseJSON']['analysisImplemented']
+                if(!analysisImplemented){
+                    button.addClass('disabled')
+                }                    
+            }
+        })
+    })
+
+
+    $('.process-btn').click(function(){
+        parameter_pt = $(this).attr('data-parameter-pt')
+        
+        url = location.origin+'/recast/processRequestPoint/{{request_info['uuid']}}/'+parameter_pt
+        $.ajax(url,{
+            complete: function(data){
+                var jobguid = data['responseJSON']['jobguid']
+                console.log(data['responseJSON'])
+
+                console.log('got jobguid: '+jobguid)
+                console.log('task ids of chain are: '+jobguid)
+                // window.location.replace(location.origin+'/monitor/' + jobguid)
+            }
+        })
+    
+    })
+
+
+    $('.result-btn').click(function(){
+        var parameter_pt = $(this).attr('data-parameter-pt')
+        window.location.replace(location.origin + '/{{request_info['analysis-uuid']}}/result/{{request_info['uuid']}}/' + parameter_pt)
+    })
+
+    $('.result-btn').each(function(){
+        var button = $(this)
+        var requestId = $(this).attr('data-parameter-pt')
+        var resultsAvailable = false
+        $.ajax(location.origin+'/status/{{request_info['uuid']}}/'+requestId,{
+            async: false,
+            complete: function(data){
+                resultsAvailable = data['responseJSON']['resultsAvailable']
+                if(!resultsAvailable){
+                    button.addClass('disabled')
+                }                    
+            }
+        })
+    })
+
+});
+</script>
+
+  
+<div id="drophtml">
+    <div class="dz-preview dz-file-preview">
+
+        <div class="dz-progress progress">
+            <div style="position:relative">
+            <div class="dz-upload progress-bar" data-dz-uploadprogress style="position:absolute;height:25px">
+            </div>
+            <div class="dz-details" style="position:absolute;">
+                <span class="dz-success-mark"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>
+                <span class="dz-error-mark"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
+                <span class="dz-size" data-dz-size></span>
+                <span class="dz-filename"><span data-dz-name style="display:inline-block;width:50%;white-space: nowrap;text-overflow:ellipsis;overflow:hidden;"></span></span>
+            </div>                
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+var uploadguid = undefined;
+
+Dropzone.options.dropzone = {
+
+    // Prevents Dropzone from uploading dropped files immediately
+    autoProcessQueue: false,
+    previewTemplate: $("#drophtml").html(),
+    dictDefaultMessage: '',  
+    uploadMultiple: true,
+    parallelUploads: 100,
+    init: function() {
+        var submitButton = document.querySelector("#create-point-btn")
+        myDropzone = this; // closure
+        submitButton.addEventListener("click", function() {
+            myDropzone.processQueue(); // Tell Dropzone to process all queued files.
+        });
+        
+        myDropzone.on('successmultiple',function(files,response){
+            console.log(files)
+            console.log(response)
+            $('#themodal').modal('hide')
+            location.reload();
+        });
+    }
+};
+</script>
+
+{% endblock %}
+
+{% block container%}
+<div class="page-header">
+    <h1>Recast Request <small>{{request_info['title']}}</small></h1>
+</div>    
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+        
+            <div class="panel-heading">
+                <h3 class="panel-title">Request Details</h3>
+            </div>
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                    {% for key,value in request_info.iteritems() %}
+                        {% if key!= 'parameter-points' %}
+                            <dt>{{key}}</dt>
+                            <dd>{{value}}</dd>
+                        {% endif %}
+                    {% endfor %}
+                </dl>        
+            </div>
+
+            <div class="panel-footer"></div>
+        </div>
+    </div> <!-- col -->
+</div> <!-- row -->
+<div class="row">
+    <div class="col-md-12">
+        <span>
+            <p>
+            <button id="add-parameter-point-btn"type="button" class="btn btn-default" aria-label="Left Align">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span>Add Parameter Point</span>
+            </button>    
+            
+            <button id="upload-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to RECAST</span>
+            </button>    
+            </p>
+
+        </span>
+    </div> <!-- col -->
+</div> <!-- row -->
+
+            
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+
+            <table id="parameter-points-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Desciption</th>
+                        <th>Number of Events</th>
+                        <th>Cross-Section</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if request_info['parameter-points']%}
+                        {% for row,row_info in request_info['parameter-points'].iteritems() %}
+                            <tr>
+                                <td>{{row}}</td>
+                                <td>{{row_info['point-name']}}</td>
+                                <td>{{row_info['run-condition'][0]['number-of-events']}}</td>
+                                <td>{{row_info['run-condition'][0]['reference-x-section']}}</td>
+                                <td>
+                                    <button data-parameter-pt="{{row}}" class="btn btn-default process-btn">process</button>
+                                    <button data-parameter-pt="{{row}}" class="btn btn-default result-btn">results</button>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            <div class="panel-footer"></div>
+        </div> <!-- panel -->
+    </div> <!-- col -->
+</div> <!-- row -->
+
+
+<div id="themodal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-body" style="overflow-y: auto;">
+        <form action="/recast/upload" method=post enctype=multipart/form-data class="dropzone" id="dropzone">
+          <input value="{{request_info['uuid']}}" name="request_uuid" type="text" class="form-control" id="request-id-modal" placeholder="Request Id">
+
+          <div class="form-group">
+            <label for="title">User</label>
+            <input value="lheinric" name="username" type="text" class="form-control" id="user-name" placeholder="username">
+          </div>
+
+          <div class="form-group">
+            <label for="title">Point Description</label>
+            <input value="" name="description" type="text" class="form-control" id="description" placeholder="description">
+          </div>
+
+          <div class="form-group">
+            <label for="title">Number of Events</label>
+            <input value="1000" name="nevents" type="text" class="form-control" id="nevents" placeholder="number of events">
+          </div>
+
+          <div class="form-group">
+            <label for="title">Cross Section (fb)</label>
+            <input value="20" name="xsec" type="text" class="form-control" id="xsec" placeholder="cross section (fb)">
+          </div>
+
+          <p>Click to add files or drop on this area</p>            
+          <div class="fallback" style="overflow-y: auto;">
+              <input name="file" type="file" multiple />
+              <input type="submit">submit</input>
+          </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="create-point-btn">Create Parameter Point</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="upload-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+           <h4 class="modal-title">Success</h4>
+      </div>
+      <div class="modal-body">
+          Uploaded latest result file to RECAST server.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+{% endblock %}

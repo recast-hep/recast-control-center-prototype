@@ -1,0 +1,33 @@
+.dropzone{
+  padding:10px;
+  height:450px;
+  overflow:scroll;
+}
+
+.dz-details{
+  position:absolute;
+  color:#333;
+}
+
+.dz-success-mark, .dz-error-mark{
+  visibility:hidden;
+}
+
+.dz-success .dz-success-mark{
+  visibility: visible;
+}
+
+.dz-error .dz-error-mark{
+  visibility: visible;
+}
+
+.dz-message{
+  top:50%;
+}
+
+.dz-message span{
+  margin:auto;
+  width:50%;
+  text-align:center;
+  display:block;
+}
