@@ -68,7 +68,7 @@ $(document).ready(function(){
 
     $('.result-btn').click(function(){
         var parameter_pt = $(this).attr('data-parameter-pt')
-        window.location.replace(location.origin + '/{{request_info['analysis-uuid']}}/result/{{request_info['uuid']}}/' + parameter_pt)
+        window.location.assign(location.origin + '/{{request_info['analysis-uuid']}}/result/{{request_info['uuid']}}/' + parameter_pt)
     })
 
     $('.result-btn').each(function(){
