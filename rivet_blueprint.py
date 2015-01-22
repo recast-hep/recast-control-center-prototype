@@ -10,7 +10,7 @@ import glob
 analyses = {x:rivet.AnalysisLoader.getAnalysis(x) for x in rivet.AnalysisLoader.analysisNames()}
 attrs = ['name','authors','bibTeX','description','experiment','name','bibKey','collider','references','status','year','spiresId','runInfo','summary']
 analyses_info = {k:{attrname:getattr(v,attrname)() for attrname in attrs} for k,v in analyses.iteritems()}
-
+analyses_info = {k:v for k,v in analyses_info.iteritems() if v['collider'] == 'LHC'}
 
 requests_colnames = ['requestId','analysisId','username','title','predefine-model','model-type']
 param_colnames = ['requestId','pointcount','description','file']
