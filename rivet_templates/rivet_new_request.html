@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-        
+{% set page_version = "RIVET" %}
+
 {% block prebody %}
 <script type="text/javascript">
 $(document).ready(function(){
@@ -8,7 +9,7 @@ $(document).ready(function(){
         var formData = new FormData($('#request-form')[0]);
  
         $.ajax({
-          url: location.origin+'/recast/createRequest',
+          url: location.origin+'/rivet/createRequest',
           type: 'POST',
           data: formData,
           async: false,
@@ -19,7 +20,7 @@ $(document).ready(function(){
             var requestId = response['requestId']
             console.log('created request: ' + requestId)
             $('#requestId').html(requestId)
-            $('#showrequest-btn').click(function(){location.href = location.origin + '/recast/request/' + requestId})            
+            $('#showrequest-btn').click(function(){location.href = location.origin + '/rivet/request/' + requestId})            
             $('#themodal').modal()
           }
         });
@@ -32,7 +33,7 @@ $(document).ready(function(){
 
 {% block container%}
 <div class="page-header">
-    <h1>New Request</h1>
+    <h1>New Request (Rivet)</h1>
 </div>    
 
 <div class="row">
@@ -41,8 +42,8 @@ $(document).ready(function(){
          <div class="form-group">
             <label for="analysis">Analysis</label>
             <select  name="analysis-uuid" class="form-control">
-                {% for analysis in analyses %}
-                    <option value="{{analysis['uuid']}}">{{analysis['title']}}</option>
+                {% for name,info in analyses_info.iteritems()%}
+                    <option value="{{name}}">{{info['name']}}</option>
                 {% endfor %}
             </select> 
         </div>

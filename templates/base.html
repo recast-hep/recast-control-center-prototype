@@ -56,17 +56,52 @@
                      </button>
                      <a class="navbar-brand" href="{{url_for('home')}}">Recast</a>
                </div>
+
         
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <!-- <form class="navbar-form navbar-left" role="search">
+                        <select  name="analysis-uuid" class="form-control" id="version-selector">
+                            <option value="RECAST">RECAST</option>
+                            <option value="RIVET">RIVET</option>
+                        </select>
+                    </form> -->
+    
+                    {% if page_version == "RIVET" %}
+                    <ul class="nav navbar-nav">
+                        <li id="nav-newreq"><a href="{{url_for('rivet.rivet_new_request')}}">New Request (Rivet)</a></li>
+                        <li id="nav-allreq"><a href="{{url_for('rivet.rivet_all_analyses_view')}}">All Analyses (Rivet)</a></li>
+                        <li id="nav-allreq"><a href="{{url_for('rivet.rivet_requests_view')}}">All Requests (Rivet)</a></li>
+                    </ul>
+                    {% else %}
                     <ul class="nav navbar-nav">
                         <li id="nav-newreq"><a href="{{url_for('recast.new_recast_request')}}">New Request</a></li>
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a></li>
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
                     </ul>
+                    {% endif %}
+
                 </div>
             </div>
         </nav>
+        
+        
+        <script type="text/javascript">
 
+        // $(document).ready(function(){
+        //     console.log('hello code here to to navbar')
+        //     $('#version-selector').change(function(){
+        //         selectedoption = $('#version-selector option:selected').val()
+        //         if(selectedoption == "RECAST"){
+        //             console.log('set links for recast')
+        //         }
+        //         if(selectedoption == "RIVET"){
+        //             console.log('set links for rivet')
+        //         }
+        //     })
+        // });
+
+        </script>
+        
         
         {% block prebody %}
         {% endblock %}

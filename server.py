@@ -114,6 +114,12 @@ from recast_interface_blueprint import recast
 
 app.register_blueprint(recast, url_prefix='/recast')
 
+from rivet_blueprint import rivetblue
+app.register_blueprint(rivetblue, url_prefix='/rivet')
+
+from general_rivet_blueprint import blueprint as rivetresultblue
+app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
+
 from catalogue import implemented_analyses
 
 for analysis_uuid,data in implemented_analyses.iteritems():

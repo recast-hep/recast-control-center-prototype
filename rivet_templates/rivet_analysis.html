@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set page_version = "RIVET" %}
+        
+{% block prebody %}
+<script type="text/javascript">
+$(document).ready(function(){
+});
+</script>
+
+{% endblock %}
+
+{% block container%}
+<div class="page-header">
+    <h1>Rivet Analysis <small>{{analysis_info['summary']}}</small></h1>
+</div>    
+
+<div class="row">
+    <div class="col-md-6">
+      <div class="panel-heading">
+        <h3 class="panel-title">Analysis Details</h3>
+      </div>
+      <div class="panel-body">
+        <dl class="dl-horizontal">
+        {% for key,value in analysis_info.iteritems() %}
+          <dt>{{key}}</dt>
+          <dd>{{value}}</dd>
+        {% endfor %}
+        </dl>        
+      </div>
+    </div>
+</div>
+
+{% endblock %}

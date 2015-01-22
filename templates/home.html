@@ -10,18 +10,20 @@ $(document).ready(function(){
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast <small>calculating fiducial efficiencies for Mono-Higgs models</small></h1>
+    <h1>Recast <small>LHC data reinterpreted</small></h1>
 </div>    
 
 <div class="row">
     <div class="col-md-6">
         <h2>Introduction</h2>
         <p>
-            This is a accompanying web service to the Higgs+MET (mono-Higgs) analysis carried out by the ATLAS experiment: <a href="https://cds.cern.ch/record/1975994">ATL-COM-PHYS-2014-1564</a>. As many dark matter models may produce this collider signature, this web service provides an interface to calculate the fiducial efficiencies for a user-provided models. The user must upload generated Monte Carlo samples in the Les Houches Event format.
+            This is an early prototype for the RECAST framework. Ultimately it will serve as an interface between theorists and experimentantalists and provide results on user-provided physics models based on existing LHC analyes.
         </p>
+
         <p>
-            Additionally this serves as a test-bed for the <a href="http://recast.perimeterinstitute.ca/">RECAST</a> project.
-        </p>
+            Also supported: run arbitrary rivet analyses on parton level (unshowered) LHE files. <a href={{url_for('rivet.rivet_new_request')}}>create a request here</a>
+         </p>
+
         <h2>Contact</h2>
         For suggestions and feedback please contact:
         <ul>
