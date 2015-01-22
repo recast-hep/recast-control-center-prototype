@@ -10,7 +10,7 @@ import glob
 analyses = {x:rivet.AnalysisLoader.getAnalysis(x) for x in rivet.AnalysisLoader.analysisNames()}
 attrs = ['name','authors','bibTeX','description','experiment','name','bibKey','collider','references','status','year','spiresId','runInfo','summary']
 analyses_info = {k:{attrname:getattr(v,attrname)() for attrname in attrs} for k,v in analyses.iteritems()}
-
+analyses_info = {k:v for k,v in analyses_info.iteritems() if v['collider'] == 'LHC'}
 
 requests_colnames = ['requestId','analysisId','username','title','predefine-model','model-type']
 param_colnames = ['requestId','pointcount','description','file']
@@ -75,11 +75,14 @@ def process_request_point(request_uuid,point):
 
   db = sqlite3.connect('rivetRequests.db')
   matching = db.execute('select * from param_points where requestId == "{}" and pointcount == {} '.format(request_uuid,point)).fetchall()
-  requestrow = db.execute('select * from requests where requestId == "{}"'.format('fe527b5c-a230-11e4-bc57-98fe944a88e0')).fetchall()
+  requestrow = db.execute('select * from requests where requestId == "{}"'.format(request_uuid)).fetchall()
   db.close()                                             
 
 
+
   print matching
+ 
+  print requestrow
 
   assert len(matching)==1
   assert len(requestrow)==1
