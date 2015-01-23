@@ -67,7 +67,7 @@ def rivet_create_request():
   return jsonify(requestId = requestId)
 
 
-import general_rivet_backendtasks
+# import general_rivet_backendtasks
 @rivetblue.route('/processRequestPoint/<request_uuid>/<point>', methods=['POST','GET'])
 def process_request_point(request_uuid,point):
 
@@ -92,8 +92,9 @@ def process_request_point(request_uuid,point):
 
   print jobinfo
   jobinfo.update({'rivetanalysis':requestrow[0][1]})
-
-  jobguid, chain = general_rivet_backendtasks.get_chain(jobinfo)
+  
+  raise NotImplementedError
+  # jobguid, chain = general_rivet_backendtasks.get_chain(jobinfo)
 
   result = chain.apply_async()
 

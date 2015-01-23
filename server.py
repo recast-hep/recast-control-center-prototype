@@ -117,8 +117,8 @@ app.register_blueprint(recast, url_prefix='/recast')
 from rivet_blueprint import rivetblue
 app.register_blueprint(rivetblue, url_prefix='/rivet')
 
-from general_rivet_blueprint import blueprint as rivetresultblue
-app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
+# from general_rivet_blueprint import blueprint as rivetresultblue
+# app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
 from catalogue import implemented_analyses
 
