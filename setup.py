@@ -22,7 +22,7 @@ setup(
     'recast-api'
   ],
   dependency_links = [
-    'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-python-emitter-0.1.3',
+    'http://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-python-emitter-0.1.3',
     'http://github.com/lukasheinrich/recast-dmhiggs-demo/tarball/master#egg=recast-dmhiggs-demo-0.0.1',
     'http://github.com/lukasheinrich/recast-rivet-recaster-demo/tarball/master#egg=recast-rivet-recaster-demo-0.0.1',
     'http://github.com/lukasheinrich/recast-hype-demo/tarball/master#egg=recast-hype-demo-0.0.1',

@@ -26,88 +26,56 @@ import msgpack
 from socketio.mixins import RoomsMixin
 
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
-  # def subscriber(self):
-  #   print "subscribing to redis socket.io#emitter"
-  #   red = redis.StrictRedis(host = 'localhost', db = 0)
-  #   pubsub = red.pubsub()
-  #   pubsub.subscribe('socket.io#emitter')
-  #   self.emit('subscribed')
-  #
-  #
-  #   for m in pubsub.listen():
-  #     # print m
-  #     if m['type'] == 'message':
-  #       data =  msgpack.unpackb(m['data'])[0]
-  #       extras =  msgpack.unpackb(m['data'])[1]
-  #
-  #       # print 'msgpack payload: {}'.format(data)
-  #       # print 'msgpack extras: {}'.format(extras)
-  #
-  #       if(data['nsp'] == '/monitor'):
-  #
-  #         if(extras['rooms']):
-  #           for room in extras['rooms']:
-  #             roomdata = [room]+data['data']
-  #             print 'emitting to room {}'.format(roomdata)
-  #             self.emit_to_room(*roomdata)
-  #         else:
-  #           print "emitting {}".format(data['data'])
-  #           self.emit(*data['data'])
-  #
-  def on_subscribe(self,msg):
-    pass#self.spawn(self.subscriber)
+  def subscriber(self):
+    print "subscribing to redis socket.io#emitter"
+    red = redis.StrictRedis(host = 'localhost', db = 0)
+    pubsub = red.pubsub()
+    pubsub.subscribe('socket.io#emitter')
+    self.emit('subscribed')
+
+    for m in pubsub.listen():
+      # print m
+      if m['type'] == 'message':
+        data =  msgpack.unpackb(m['data'])[0]
+        extras =  msgpack.unpackb(m['data'])[1]
+
+        # print 'msgpack payload: {}'.format(data)
+        # print 'msgpack extras: {}'.format(extras)
+        #
+        #
+        # print 'NB: self rooms are {}'.format(self.session['rooms'])
+        #
+        if(data['nsp'] == '/monitor'):
+          if(extras['rooms']):
+            for room in extras['rooms']:
+              #if this socket joined the room this message is sent to emit to it
+              #this is a small workaround since every client has one of these
+              #redis subscriptions so emit_to_room would result into multiple msgs
+              #being sent
+              if(self._get_room_name(room) in self.session['rooms']):
+                self.emit(*data['data'])
+          else:
+              self.emit(*data['data'])
+    
+  def on_subscribe(self):
+    self.spawn(self.subscriber)
+
+  def on_helloServer(self):
+    print "hello back"
+    self.emit('plainEmit')
+    print "emitting to room"
+
 
   def on_join(self,data):
     print "joining room: {}".format(data['room'])
     self.join(data['room'])
-    self.join("myRoom")
+
     self.emit('joined')
 
-
-  def luke_emit_to_room(self, room, event, *args):
-    """This is sent to all in the room (in this particular Namespace)"""
-    pkt = dict(type="event",name=event,args=[],endpoint=self.ns_name)
-
-    room_name = self._get_room_name(room)
-
-    print 'room name would be: {}'.format(room_name)
-
-    for sessid, socket in self.socket.server.sockets.iteritems():
-      if room_name in socket.session['rooms']:
-        socket.send_packet(pkt)
-
-
-  def puke_emit_to_room(self, room, event, *args):
-    """This is sent to all in the room (in this particular Namespace)"""
-    pkt = dict(type="event",name=event,args=[],endpoint=self.ns_name)
-    room_name = self._get_room_name(room)
-
-    print 'room name would be: {}'.format(room_name)
-
-    for sessid, socket in self.socket.server.sockets.iteritems():
-      print socket
-      print self.socket
-      notsame = (socket != self.socket)
-      roompresent = (room_name in socket.session['rooms'])
-
-      print "rooms: {}".format(socket.session['rooms'])
-      print "notsame: {}, room present: {}".format(notsame,roompresent)
-
-      if room_name in socket.session['rooms'] and self.socket != socket:
-        print "sending packet"
-        socket.send_packet(pkt)
-        # gevent.sleep(0)
-      print '---'
-
   def on_emitToRoom(self,data):
-    print "emitting to room: {}".format(data['room'])
-    self.puke_emit_to_room(data['room'],'room_msg','hello')
-
-
-
-  def on_emitToAll(self):
-    print "emitting to all"
-    self.emit('room_msg','hello')
+    print "emitting to room: {} and myself".format(data['room'])
+    self.emit('room_msg',data['msg']) 
+    self.emit_to_room(data['room'],'room_msg',data['msg'])
 
 
 from recast_interface_blueprint import recast
@@ -149,10 +117,13 @@ def plots(requestId,parameter_pt,file):
   filepath = 'results/{}/{}/{}'.format(requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
+@app.route('/monitor/<jobguid>')
+def monitorview(jobguid):
+  return render_template('monitor.html', jobguid = jobguid)
 
 @app.route('/socket.io/<path:remaining>')
 def socketio(remaining):
-    # print request.environ
+    print "socket io route called"
     socketio_manage(request.environ, {
         '/monitor': MonitoringNamespace
     })
@@ -161,4 +132,4 @@ def socketio(remaining):
 from socketio.server import SocketIOServer, serve
 
 if __name__ == "__main__":
-  serve(app, port = 5000, host = '0.0.0.0')
+  serve(app, port = 8000, host = '0.0.0.0')

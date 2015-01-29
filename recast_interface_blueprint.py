@@ -107,6 +107,8 @@ def process_request_point(request_uuid,point):
    
   result = chain.apply_async()
 
+  print result
+
   return jsonify(jobguid=jobguid, task_ids = ['list of task ids']) 
   
   

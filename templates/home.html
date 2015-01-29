@@ -3,6 +3,23 @@
 {% block prebody %}
 <script type="text/javascript">
 $(document).ready(function(){
+
+    var socket = io.connect('http://localhost:8000/monitor');
+
+    socket.emit('helloServer')
+    socket.emit('subscribe')
+
+    socket.emit('join',{room: 'first_room'});
+    
+    socket.on('plainEmit', function () {
+        console.log('we can hear you');
+    });
+
+    socket.on('room_msg', function (data) {
+        console.log('got msg from room');
+        console.log(data)
+    });
+
 });
 </script>
 
@@ -10,19 +27,29 @@ $(document).ready(function(){
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast <small>LHC data reinterpreted</small></h1>
+    <h1>Recast <small>An Analysis Reinterpretation Framework</small></h1>
 </div>    
 
 <div class="row">
     <div class="col-md-6">
         <h2>Introduction</h2>
         <p>
-            This is an early prototype for the RECAST framework. Ultimately it will serve as an interface between theorists and experimentantalists and provide results on user-provided physics models based on existing LHC analyes.
+            This is an early prototype for the RECAST framework. This web application communicates with the RECAST front-end at http://recast.perimeterinstitute.ca and provides a plugin model for analyses.
         </p>
 
         <p>
             Also supported: run arbitrary rivet analyses on parton level (unshowered) LHE files. <a href={{url_for('rivet.rivet_new_request')}}>create a request here</a>
          </p>
+
+        <h2>Links and Related Projects</h2>
+        <ul>
+            <li><a href="http://arxiv.org/abs/1010.2506">original white paper</a></li>
+            <li><a href="https://twiki.cern.ch/twiki/pub/AtlasPublic/AtlasPolicyDocuments/A78_ATLAS_Data_Access_Policy.pdf">ATLAS Data Access Policy </a></li>
+            <li><a href="http://arxiv.org/pdf/1205.4667.pdf">DPHEP Status Report</a></li>
+            <li><a href="https://daspos.crc.nd.edu">DASPOS</a></lie>
+            <li><a href="http://data-demo.cern.ch">CERN Analysis Preservation Demo </a></lie>
+        </ul>
+
 
         <h2>Contact</h2>
         For suggestions and feedback please contact:
