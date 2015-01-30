@@ -55,9 +55,9 @@ $(document).ready(function(){
     <div class="col-md-10">
       <div class="panel-body">
         <dl class="dl-horizontal">
-        {% for key,value in analysis_info.iteritems() %}
+        {% for key in ['doi','inspire','collaboration','description'] %}
           <dt>{{key}}</dt>
-          <dd>{{value}}</dd>
+          <dd>{{analysis_info[key]}}</dd>
         {% endfor %}
         </dl>        
       </div>

@@ -33,7 +33,7 @@ def recast_analysis_view(uuid):
 @recast.route('/analyses')
 def recast_analyses_view():
   analyses_info = recastapi.analysis.analysis()
-  return render_template('recast_all_analyses.html', analyses_info = analyses_info)
+  return  render_template('recast_all_analyses.html', analyses_info = analyses_info)
 
 @recast.route('/analysis_status/<analysis_uuid>')
 def status(analysis_uuid):
