@@ -14,16 +14,11 @@ import recastapi.analysis
 
 from catalogue import implemented_analyses
 
-@recast.route('/newrequest')
-def new_recast_request():
-  analyses = recastapi.analysis.analysis()
-  analyses = [a for a in analyses if a['uuid'] in implemented_analyses]
-  return render_template('recast_new_request.html', analyses = analyses)
-
 @recast.route('/request/<uuid>')
 def recast_request_view(uuid):
   request_info = recastapi.request.request(uuid)
-  return render_template('recast_request.html', request_info = request_info)
+  analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
+  return render_template('recast_request.html', request_info = request_info, analysis_info = analysis_info)
 
 @recast.route('/requests')
 def recast_requests_view():
@@ -33,7 +28,7 @@ def recast_requests_view():
 @recast.route('/analysis/<uuid>')
 def recast_analysis_view(uuid):
   analysis_info = recastapi.analysis.analysis(uuid)
-  return render_template('recast_analysis.html', analysis_info = analysis_info)
+  return render_template('recast_analysis.html', analysis_info = analysis_info, analysis_implemented = (uuid in implemented_analyses))
 
 @recast.route('/analyses')
 def recast_analyses_view():
@@ -76,6 +71,7 @@ def upload():
 @recast.route('/createRequest', methods=['GET','POST'])
 def create_request():
   print 'hello'
+  print request.form
   r = recastapi.request.create(request.form['username'],
                                request.form['analysis-uuid'],
                                request.form['model-type'],

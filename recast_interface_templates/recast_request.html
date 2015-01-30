@@ -154,8 +154,10 @@ Dropzone.options.dropzone = {
             </div>
             <div class="panel-body">
                 <dl class="dl-horizontal">
+                            <dt>analysis</dt>
+                            <dd><a href="/recast/analysis/{{analysis_info['uuid']}}">{{analysis_info['title']}}</a></dd>
                     {% for key,value in request_info.iteritems() %}
-                        {% if key!= 'parameter-points' %}
+                        {% if key not in ['parameter-points','analysis-uuid'] %}
                             <dt>{{key}}</dt>
                             <dd>{{value}}</dd>
                         {% endif %}
