@@ -78,7 +78,15 @@
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
                     </ul>
                     {% endif %}
+                
+                    <ul class="nav navbar-nav navbar-right">
+                    {% if session.has_key('user') %}
+                        <li id="nav-allreq"><a>Logged in as {{session['user']['username']}}</a></li>
+                    {% else %}
+                        <li id="nav-allreq"><a href="/login">Login</a></li>
+                    {% endif %}
 
+                    </ul>
                 </div>
             </div>
         </nav>

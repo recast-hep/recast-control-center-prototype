@@ -133,7 +133,10 @@ for analysis_uuid,data in implemented_analyses.iteritems():
 #
 @app.route("/")
 def home():
-    return render_template('home.html', userinfo = session.get('user',{}))
+    # if(session.has_key('user')): session.pop('user')
+    # session['user'] =  {'username':'lukas'}
+    userinfo = session.get('user',{})
+    return render_template('home.html', userinfo = userinfo)
 
 @app.route("/rivet")
 def rivethome():
