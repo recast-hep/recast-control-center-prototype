@@ -24,6 +24,26 @@
 </div>
 
 <div class="row">
+    
+    <h3>Analyses with implemented Backend</h3>
+    <table id="analysesTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Collaboration</th>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in implemented %}
+                    <tr>
+                        <td>{{row['collaboration']}}</td>
+                        <td><a href="/recast/analysis/{{row['uuid']}}">{{row['title']}}</a></td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Analyses without implemented Backend</h3>
 
     <table id="analysesTable" class="table table-striped">
         <thead>
@@ -33,7 +53,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for row in analyses_info %}
+            {% for row in notimplemented %}
                     <tr>
                         <td>{{row['collaboration']}}</td>
                         <td><a href="/recast/analysis/{{row['uuid']}}">{{row['title']}}</a></td>

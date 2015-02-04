@@ -33,7 +33,12 @@ def recast_analysis_view(uuid):
 @recast.route('/analyses')
 def recast_analyses_view():
   analyses_info = recastapi.analysis.analysis()
-  return  render_template('recast_all_analyses.html', analyses_info = reversed(analyses_info))
+  implemented = [x for x in reversed(analyses_info) if x['uuid'] in implemented_analyses]
+  notimplemented = [x for x in reversed(analyses_info) if x['uuid'] not in implemented_analyses]
+
+  print implemented
+  # print notimplemented
+  return  render_template('recast_all_analyses.html', implemented = implemented, notimplemented = notimplemented)
 
 @recast.route('/analysis_status/<analysis_uuid>')
 def status(analysis_uuid):
