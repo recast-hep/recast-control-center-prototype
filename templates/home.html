@@ -40,10 +40,11 @@ $(document).ready(function(){
         <h2>Instructions</h2>
         <p>
             <ol>
-            <li>To test the RECAST service, click on the <a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a> link in the navigation above. Select the analyses that you want to recast.</li>
+            <li>To test the RECAST service, click on the <a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a> link in the navigation above. Select the analyses that you want to recast. Alternatively you can also create a request on the <a href="http://recast.perimeterinstitute.ca/dev"></a>main RECAST website</a> (currently the development instance)</li>
             <li>To create a new request click the "New RECAST Request" button and fill out the form. After you created the request you can click through to the page describing your new request</li>
             <li>On the request page you can now upload simulated events for specific parameter points in the Les Houches format (currently they need a '*.events' extension as per ATLAS convention). To do that click the "Add Parameter Point" button, describe the parameter point and select the necessary event files (you don't need to worry about the cross-section and number of events for now. Dummy values are OK.)</li>
             <li>Now that you have created a parameter point, you can process the request by hitting the "Process" button. Once the results become available you can view the results for the parameter point (you will need to reload the page at the moment).
+            <li>Once the results have arrived, you can upload the response to the RECAST frontend by clicking the "Upload to RECAST" button</li>
         </ol>
 
         <h3>Running Rivet analyses</h3>
