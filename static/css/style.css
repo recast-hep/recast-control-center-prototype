@@ -31,3 +31,12 @@
   text-align:center;
   display:block;
 }
+
+.logwindow{
+  background-color:#333;
+  color:#eee
+}
+
+.logdatetime{
+  color:#f77;padding-right:1em;
+}

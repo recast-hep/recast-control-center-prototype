@@ -5,20 +5,7 @@
 $(document).ready(function(){
 
     var socket = io.connect(location.origin+'/monitor');
-
     socket.emit('helloServer')
-    socket.emit('subscribe')
-
-    socket.emit('join',{room: 'first_room'});cl
-    
-    socket.on('plainEmit', function () {
-        console.log('we can hear you');
-    });
-
-    socket.on('room_msg', function (data) {
-        console.log('got msg from room');
-        console.log(data)
-    });
 
 });
 </script>
