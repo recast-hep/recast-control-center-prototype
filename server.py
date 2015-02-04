@@ -1,7 +1,7 @@
 import gevent
 from gevent import monkey; monkey.patch_all()
 
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session
 
 from socketio.namespace import BaseNamespace
 from socketio import socketio_manage
@@ -11,6 +11,41 @@ import uuid
 import os
 
 app = Flask('RECAST-demo')
+app.secret_key = 'somesecret'
+
+# Map SSO attributes from ADFS to session keys under session['user']
+SSO_ATTRIBUTE_MAP = {
+  'HTTP_ADFS_LOGIN': (True, 'username'),
+  #'ADFS_LOGIN': (True, 'username'),
+  #'ADFS_FULLNAME': (True, 'fullname'),
+  #'ADFS_PERSONID': (True, 'personid'),
+  #'ADFS_DEPARTMENT': (True, 'department'),
+  #'ADFS_EMAIL': (True, 'email')
+  # There are other attributes available
+  # Inspect the argument passed to the login_handler to see more
+  # 'ADFS_AUTHLEVEL': (False, 'authlevel'),
+  # 'ADFS_GROUP': (True, 'group'),
+  # 'ADFS_ROLE': (False, 'role'),
+  # 'ADFS_IDENTITYCLASS': (False, 'external'),
+  # 'HTTP_SHIB_AUTHENTICATION_METHOD': (False, 'authmethod'),
+  }
+app.config.setdefault('SSO_ATTRIBUTE_MAP', SSO_ATTRIBUTE_MAP)
+app.config.setdefault('SSO_LOGIN_URL', '/login')
+
+from flask_sso import SSO
+ext = SSO(app=app)
+
+@ext.login_handler
+def login(user_info):
+  session['user'] = user_info
+  return redirect('/')
+
+@app.route('/logout')
+def logout():
+  session.pop('user')
+  return redirect('/')
+
+
 
 app.debug = True
 
@@ -98,7 +133,7 @@ for analysis_uuid,data in implemented_analyses.iteritems():
 #
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template('home.html', userinfo = session.get('user',{}))
 
 @app.route("/rivet")
 def rivethome():

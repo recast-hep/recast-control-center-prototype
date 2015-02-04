@@ -17,7 +17,7 @@ param_colnames = ['requestId','pointcount','description','file']
 
 @rivetblue.route('/analyses')
 def rivet_all_analyses_view():
-  return render_template('rivet_all_analyses.html', analyses_info = reversed(analyses_info))
+  return render_template('rivet_all_analyses.html', analyses_info = analyses_info)
 
 @rivetblue.route('/analysis/<rivetID>')
 def rivet_analysis_view(rivetID):
@@ -30,7 +30,7 @@ def rivet_requests_view():
   requests = db.execute('select * from requests').fetchall()
   db.close()
   requests_info = [dict(zip(requests_colnames,r)) for r in requests]
-  return render_template('rivet_all_requests.html', requests_info = reversed(requests_info))
+  return render_template('rivet_all_requests.html', requests_info = requests_info)
 
 @rivetblue.route('/request/<uuid>')
 def recast_request_view(uuid):
