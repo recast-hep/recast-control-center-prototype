@@ -10,7 +10,7 @@ from celery.result import BaseAsyncResult
 import uuid
 import os
 
-app = Flask(__name__)
+app = Flask('RECAST-demo')
 
 app.debug = True
 
@@ -39,8 +39,8 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
         data =  msgpack.unpackb(m['data'])[0]
         extras =  msgpack.unpackb(m['data'])[1]
 
-        # print 'msgpack payload: {}'.format(data)
-        # print 'msgpack extras: {}'.format(extras)
+        print 'msgpack payload: {}'.format(data)
+        print 'msgpack extras: {}'.format(extras)
         #
         #
         # print 'NB: self rooms are {}'.format(self.session['rooms'])
@@ -85,8 +85,8 @@ app.register_blueprint(recast, url_prefix='/recast')
 from rivet_blueprint import rivetblue
 app.register_blueprint(rivetblue, url_prefix='/rivet')
 
-# from general_rivet_blueprint import blueprint as rivetresultblue
-# app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
+from recastrivet.general_rivet_blueprint import blueprint as rivetresultblue
+app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
 from catalogue import implemented_analyses
 
