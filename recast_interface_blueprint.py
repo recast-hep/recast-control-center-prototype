@@ -45,7 +45,7 @@ def status(analysis_uuid):
   available =  (analysis_uuid in implemented_analyses)
   return jsonify(analysisImplemented=available)
 
-
+import IPython
 @recast.route('/upload',methods = ['POST','GET'])
 def upload():
   #rudimentary.. better: http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
@@ -61,12 +61,23 @@ def upload():
   os.makedirs(uploaddir)
 
   for f in request.files.itervalues(): f.save('{}/{}'.format(uploaddir,f.filename))
-
-  zippedfile = '{}/my.zip'.format(uploaddir)
-  with ZipFile(zippedfile,'w') as zipfile:
-    for file in glob.glob('{}/*'.format(uploaddir)):
-      if(os.path.basename(file)!=os.path.basename(zippedfile)):
-	zipfile.write(file,os.path.basename(file))
+  
+  print "CHECK"
+  print (len(request.files) == 1)
+  print (request.files.values()[0].filename.endswith('.zip'))
+  alreadyzipped = (len(request.files) == 1 and request.files.values()[0].filename.endswith('.zip'))
+  print alreadyzipped
+  if(alreadyzipped):
+    zippedfile = '{}/{}'.format(uploaddir,request.files.values()[0].filename)
+    print "using uploaded zipfile: {}".format(zippedfile)
+  else:
+    zippedfile = '{}/my.zip'.format(uploaddir)
+    print "zipping my own zipfile: {}".format(zippedfile)
+  
+    with ZipFile(zippedfile,'w') as zipfile:
+      for file in glob.glob('{}/*'.format(uploaddir)):
+        if(os.path.basename(file)!=os.path.basename(zippedfile)):
+  	      zipfile.write(file,os.path.basename(file))
 
   r = recastapi.request.add_parameter_point(requestuuid,username,description,nevents,xsec,zippedfile)
   
