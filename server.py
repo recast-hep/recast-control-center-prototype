@@ -100,6 +100,10 @@ for analysis_uuid,data in implemented_analyses.iteritems():
 def home():
     return render_template('home.html')
 
+@app.route("/rivet")
+def rivethome():
+    return render_template('rivethome.html')
+
 @app.route('/status/<requestId>')
 def request_status(requestId):
   resultdir = 'results/{}'.format(requestId)

@@ -38,7 +38,7 @@
         <tbody>
             {% for analysisId,analysisInfo in analyses_info.iteritems() %}
                     <tr>
-                        <td>{{analysisId}}</td>
+                        <td><a href="/rivet/analysis/{{analysisId}}">{{analysisId}}</a></td>
                         <td>{{analysisInfo['collider']}}</td>
                         <td>{{analysisInfo['experiment']}}</td>
                         <td>{{analysisInfo['summary']}}</td>

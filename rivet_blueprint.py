@@ -46,10 +46,6 @@ def recast_request_view(uuid):
 
   return render_template('rivet_request.html', request_info = request_info, param_info = param_info)
 
-@rivetblue.route('/newrequest')
-def rivet_new_request():
-  return render_template('rivet_new_request.html', analyses_info = analyses_info)
-
 @rivetblue.route('/createRequest',methods=['POST','GET'])
 def rivet_create_request():
   requestId = uuid.uuid1()
