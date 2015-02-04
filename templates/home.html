@@ -27,16 +27,19 @@ $(document).ready(function(){
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast Control Center<small>An Analysis Reinterpretation Framework</small></h1>
+    <h1>Recast Control Center <small>An Analysis Reinterpretation Framework</small></h1>
 </div>    
 
 <div class="row">
     <div class="col-md-6">
         <h2>Introduction</h2>
         <p>
-            This is an early prototype for the RECAST framework. This web application communicates with the RECAST front-end at <a href="http://recast.perimeterinstitute.ca">http://recast.perimeterinstitute.ca</a> and provides a plugin model for analyses.
+            This is an early prototype for the RECAST control center. While the RECAST front-end at  <a href="http://recast.perimeterinstitute.ca">http://recast.perimeterinstitute.ca</a> is used to gather requests for analysis reinterpretation from the community, this web application is used to launch jobs for different back-ends that actually perform the reinterpretation.
         </p>
-
+        <p>It supports CERN SSO authentication which will allow for fine-grained control over which users are able to launch the reinterpretation jobs and/or upload the results to the front-end. This web application provides a plugin model for analyses. Currently, we have a template plugin for Rivet analyses that runs quickly. We are working with CERN IT’s analysis preservationproduct to provide a template plugin for reinterpretation basedon the full simulation, reconstruction, and event selection.
+        </p>
+        <p>For convenience, one can initiate a request directly from the control center, which will be uploaded to the front-end.
+</p>
         <h2>Instructions</h2>
         <p>
             <ol>
