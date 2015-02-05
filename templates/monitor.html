@@ -12,6 +12,7 @@ $(document).ready(function(){
     socket.on('room_msg', function (data) {
             console.log('got msg from room');
             console.log(data)
+            $('.logwindow').prepend('<span class="logdatetime">'+data['date']+'</span><span>'+data['msg']+'</span>\n')
         });
 
 });
@@ -28,8 +29,6 @@ $(document).ready(function(){
 <div class="row">
     <div class="col-md-9">
         <pre class="logwindow" style="">
-<span class="logdatetime">2015-02-03 19:45</span><span>two for six Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
-<span class="logdatetime">2015-02-03 19:45</span><span>two for six</span>
         </pre>
     </div>
 </div>
