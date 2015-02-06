@@ -8,11 +8,12 @@ $(document).ready(function(){
 
     socket.emit('helloServer');
     socket.emit('subscribe');
-    socket.emit('join',{room:'another'});
+    socket.emit('join',{room:'{{jobguid}}'});
     socket.on('room_msg', function (data) {
             console.log('got msg from room');
             console.log(data)
             $('.logwindow').prepend('<span class="logdatetime">'+data['date']+'</span><span>'+data['msg']+'</span>\n')
+	    if(data['msg']=='done'){window.history.back();}
         });
 
 });
@@ -28,8 +29,8 @@ $(document).ready(function(){
 
 <div class="row">
     <div class="col-md-9">
-        <pre class="logwindow" style="">
-        </pre>
+        <p>Messages from the request processor will appear below.</p>
+        <pre class="logwindow" style=""></pre>
     </div>
 </div>
 {% endblock %}
