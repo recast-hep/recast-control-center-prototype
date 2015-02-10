@@ -42,7 +42,7 @@ $(document).ready(function(){
                 analysisImplemented = data['responseJSON']['analysisImplemented']
                 if(!analysisImplemented){
                     button.addClass('disabled')
-                }                    
+                }
             }
         })
     })
@@ -50,8 +50,10 @@ $(document).ready(function(){
 
     $('.process-btn').click(function(){
         parameter_pt = $(this).attr('data-parameter-pt')
-        
-        url = location.origin+'/recast/processRequestPoint/{{request_info['uuid']}}/'+parameter_pt
+        backend = $(this).attr('data-backend')
+        url = location.origin+'/recast/processRequestPoint/{{request_info['uuid']}}/'+parameter_pt+'?'+'backend='+backend
+        console.log('processing requested using backend: '+backend)
+
         $.ajax(url,{
             complete: function(data){
                 var jobguid = data['responseJSON']['jobguid']
@@ -186,7 +188,6 @@ Dropzone.options.dropzone = {
     </div> <!-- col -->
 </div> <!-- row -->
 
-            
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -210,8 +211,20 @@ Dropzone.options.dropzone = {
                                 <td>{{row_info['run-condition'][0]['number-of-events']}}</td>
                                 <td>{{row_info['run-condition'][0]['reference-x-section']}}</td>
                                 <td>
-                                    <button data-parameter-pt="{{row}}" class="btn btn-default process-btn">process</button>
-                                    <button data-parameter-pt="{{row}}" class="btn btn-default result-btn">results</button>
+                                    <!-- Single button -->
+                                    <div class="btn-group">
+                                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        Process <span class="caret"></span>
+                                      </button>
+                                      <ul class="dropdown-menu" role="menu">
+                                      {% for b in backends %}
+                                        <li><a href="#" class="process-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
+                                      {% endfor %}
+                                      </ul>
+                                    </div>
+
+                                    <!-- <button data-parameter-pt="{{row}}" class="btn btn-default process-btn">process</button> -->
+                                    <button data-parameter-pt="{{row}}" class="btn btn-default result-btn">Results</button>
                                 </td>
 
                             </tr>

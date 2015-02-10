@@ -3,9 +3,6 @@
 {% block prebody %}
 <script type="text/javascript">
 $(document).ready(function(){
-    {% if not analysis_implemented %}
-    $('#create-request-dialog-btn').addClass('disabled')
-    {% endif %}
     $('#create-request-dialog-btn').click(function(){
        $('#newrequestmodal').modal() 
     })
@@ -16,11 +13,18 @@ $(document).ready(function(){
            $('#title').parent().addClass('has-error')
            return;
        }
+       
+       if($('#radioSpecificBackend').is(':checked') && $('#backendSelector input:checked').length == 0){
+           console.log('need to select at least one backend')
+           return;
+       }
 
        $('#newrequestmodal').modal('hide') 
 
        //grab all form data  
         var formData = new FormData($('#request-form')[0]);
+ 
+        
  
         $.ajax({
           url: location.origin+'/recast/createRequest',
@@ -40,6 +44,16 @@ $(document).ready(function(){
         });
 
     })
+
+    $('#backendSelector').hide()
+    $('#radioSpecificBackend').click(function(){
+        $('#backendSelector').show()
+    })
+    $('#radioAllBackends').click(function(){
+        $('#backendSelector input').attr('checked',false)
+        $('#backendSelector').hide()
+    })
+
 });
 </script>
 
@@ -55,12 +69,19 @@ $(document).ready(function(){
     <div class="col-md-10">
       <div class="panel-body">
         <dl class="dl-horizontal">
-        {% for key in ['doi','inspire','collaboration','description'] %}
+        {% for key in ['doi','inspire','collaboration','description','journal'] %}
           <dt>{{key}}</dt>
           <dd>{{analysis_info[key]}}</dd>
         {% endfor %}
-        </dl>        
+        <dt>available backends:</dt>
+        {% if backends %}
+        <dd>{{', '.join(backends)}}</dd>
+        {% else %}
+        <dd>Unfortunately, no backend is available for this analysis yet.</dd>
+        {% endif %}
+    </dl>        
       </div>
+
     </div>
 </div>
 
@@ -98,6 +119,34 @@ $(document).ready(function(){
             <label for="title">Model type</label>
             <input value="SUSY" name="model-type" type="text" class="form-control" id="model-type" placeholder="Model type">
           </div>
+          <div class="form-group">
+            <label for="title">Backend</label>
+            
+            <div class="radio">
+              <label>
+                <input type="radio" name="backendchoice" value="all" id="radioAllBackends" checked> All backends (including future ones)
+              </label>
+            </div>
+            {% if backends %}
+            <div class="radio">
+              <label>
+                <input type="radio" name="backendchoice" value="select" id="radioSpecificBackend"> Specific backend
+              </label>
+            </div>
+            <div id="backendSelector">
+                {% for b in backends %}
+                <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="backend" value="{{b}}"> {{b}}
+                    </label>
+                  </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+
+
         </form>
       </div>
       <div class="modal-footer">

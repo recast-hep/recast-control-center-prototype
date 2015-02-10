@@ -11,14 +11,28 @@ import glob
 
 import recastapi.request 
 import recastapi.analysis 
+import pickle
+import pkg_resources
+
+import recastrivet
 
 from catalogue import implemented_analyses
+rivetnameToUUID = pickle.loads(pkg_resources.resource_string('recastrivet','rivetmap.pickle'))
+UUIDtoRivet = {v:k for k,v in rivetnameToUUID.iteritems()}
+# for uuid in implemented_analyses.keys():
+#   UUIDtoRivet[uuid] = "DUMMY"
+
+def getBackends(uuid):
+  backends = []
+  if uuid in implemented_analyses: backends+=['dedicated']
+  if uuid in UUIDtoRivet: backends+=['rivet']
+  return backends
 
 @recast.route('/request/<uuid>')
 def recast_request_view(uuid):
   request_info = recastapi.request.request(uuid)
   analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
-  return render_template('recast_request.html', request_info = request_info, analysis_info = analysis_info)
+  return render_template('recast_request.html', request_info = request_info, analysis_info = analysis_info, backends = getBackends(request_info['analysis-uuid']))
 
 @recast.route('/requests')
 def recast_requests_view():
@@ -28,17 +42,17 @@ def recast_requests_view():
 @recast.route('/analysis/<uuid>')
 def recast_analysis_view(uuid):
   analysis_info = recastapi.analysis.analysis(uuid)
-  return render_template('recast_analysis.html', analysis_info = analysis_info, analysis_implemented = (uuid in implemented_analyses))
+  return render_template('recast_analysis.html', analysis_info = analysis_info, backends = getBackends(uuid))
 
 @recast.route('/analyses')
 def recast_analyses_view():
   analyses_info = recastapi.analysis.analysis()
-  implemented = [x for x in reversed(analyses_info) if x['uuid'] in implemented_analyses]
-  notimplemented = [x for x in reversed(analyses_info) if x['uuid'] not in implemented_analyses]
+  backends = {x['uuid']:getBackends(x['uuid']) for x in analyses_info}
 
-  print implemented
-  # print notimplemented
-  return  render_template('recast_all_analyses.html', implemented = implemented, notimplemented = notimplemented)
+  implemented = [x for x in reversed(analyses_info) if backends[x['uuid']]]
+  notimplemented = [x for x in reversed(analyses_info) if not backends[x['uuid']]]
+
+  return  render_template('recast_all_analyses.html', implemented = implemented, notimplemented = notimplemented, backends = backends)
 
 @recast.route('/analysis_status/<analysis_uuid>')
 def status(analysis_uuid):
@@ -88,15 +102,32 @@ def upload():
 def create_request():
   print 'hello'
   print request.form
+
+  backendchoice = request.form['backendchoice']
+  audience = ''
+  subscribers = ''
+  if(backendchoice == 'all'):
+    audience = 'all'
+  if(backendchoice == 'select'):
+    audience = 'selective'
+    backends = dict(request.form.lists())['backend']
+    subscribers = ['backend-{}'.format(b) for b in backends]
+
+  #make sure an audience is set
+  assert audience
+
+  print 'audience {}'.format(audience)
+  print 'subscribers {}'.format(subscribers)
+  
   r = recastapi.request.create(request.form['username'],
                                request.form['analysis-uuid'],
                                request.form['model-type'],
                                request.form['title'],
                                request.form['predefined-model'],
                                reason = 'because we can',
-                               audience = 'all',
+                               audience = audience,
                                activate = True,
-                               subscribers = ['lheinric'])
+                               subscribers = subscribers)
   print 'done'
   return jsonify(requestId = json.loads(r.content))
   
@@ -107,19 +138,43 @@ def find_beginning(result):
 @recast.route('/processRequestPoint/<request_uuid>/<point>', methods=['POST','GET'])
 def process_request_point(request_uuid,point):
   print "hello"
+  print request_uuid
+  print point
   request_info = recastapi.request.request(request_uuid)
 
-  if not request_info['analysis-uuid'] in implemented_analyses:
-    print "analysis not implemented!"
+  analysis_uuid = request_info['analysis-uuid']
+  
+  backend = request.args['backend']
+
+  rivetanalysisname = None
+  if backend == 'rivet' and (analysis_uuid not in UUIDtoRivet):
+    raise NotImplementedError
+    rivetanalysisname = UUIDtoRivet[analysis_uuid]
+    print rivetanalysisname
+
+  if backend == 'dedicated' and (analysis_uuid not in implemented_analyses):
     raise NotImplementedError
 
-  jobguid, chain = implemented_analyses[request_info['analysis-uuid']]['workflow'].get_chain(request_uuid,point)
 
+  print backend
+
+
+  jobguid = None
+  chain = None
+  if backend == 'rivet':
+    assert rivetanalysisname
+    jobguid, chain = recastrivet.general_rivet_backendtasks.get_chain(request_uuid,point,rivetanalysisname)
+  if backend == 'dedicated':
+    jobguid, chain = implemented_analyses[request_info['analysis-uuid']]['workflow'].get_chain(request_uuid,point)
+
+  print jobguid
   print chain
-   
-  result = chain.apply_async()
 
-  print result
+  return jsonify(jobguid=0) 
+   
+  # result = chain.apply_async()
+
+  # print result
 
   return jsonify(jobguid=jobguid, task_ids = ['list of task ids']) 
   
