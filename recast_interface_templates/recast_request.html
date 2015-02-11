@@ -9,7 +9,6 @@ $(document).ready(function(){
     $('#request-id-modal').hide()
     $('#drophtml').hide()
 
-
     $('#upload-response-btn').click(function(){
         url = location.origin+'/recast/updateResponse/{{request_info['uuid']}}'
         $.ajax(url,{
@@ -83,7 +82,12 @@ $(document).ready(function(){
             }
         })
     })
-
+    
+    $('.results-group').each(function(){
+        if(!$(this).children().filter('ul').children().filter(function(){return !$(this).hasClass('disabled')}).length){
+            $(this).children().filter('button').addClass('disabled')
+        }
+    })
 });
 </script>
 
@@ -208,7 +212,7 @@ Dropzone.options.dropzone = {
                                 <td>{{row_info['run-condition'][0]['reference-x-section']}}</td>
                                 <td>
                                     <!-- Single button -->
-                                    <div class="btn-group">
+                                    <div class="btn-group process-group">
                                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         Process <span class="caret"></span>
                                       </button>
@@ -218,9 +222,8 @@ Dropzone.options.dropzone = {
                                       {% endfor %}
                                       </ul>
                                     </div>
-
                                     <!-- Single button -->
-                                    <div class="btn-group">
+                                    <div class="btn-group results-group">
                                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         Results <span class="caret"></span>
                                       </button>
