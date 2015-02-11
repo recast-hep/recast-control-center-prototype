@@ -1,7 +1,7 @@
 import gevent
 from gevent import monkey; monkey.patch_all()
 
-from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session
+from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for
 
 from socketio.namespace import BaseNamespace
 from socketio import socketio_manage
@@ -143,16 +143,17 @@ def rivethome():
     return render_template('rivethome.html')
 
 RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
-
 @app.route('/status/<requestId>')
-def request_status(requestId):
+def request_overall_status(requestId):
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,requestId)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
 @app.route('/status/<requestId>/<parameter_pt>')
 def request_point_status(requestId,parameter_pt):
-  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,requestId)
+  backend = request.args['backend']
+  assert backend
+  resultdir = '{}/results/{}/{}'.format(RECASTSTORAGEPATH,requestId,backend)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
@@ -160,6 +161,21 @@ def request_point_status(requestId,parameter_pt):
 def plots(requestId,parameter_pt,file):
   filepath = '{}/results/{}/{}/{}'.format(RECASTSTORAGEPATH,requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
+
+import recastapi
+import json
+@app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
+def resultview(requestId,parameter_pt,backend):
+  request_info = recastapi.request.request(requestId)
+  analysis_uuid = request_info['analysis-uuid']
+  if backend == 'dedicated':
+    blueprintname = implemented_analyses[analysis_uuid]['blueprint'].name
+    print url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt)
+    return redirect(url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt))
+  if backend == 'rivet':
+    print url_for('general_rivet.result_view',requestId=requestId,parameter_pt=parameter_pt)
+    return redirect(url_for('general_rivet.result_view',requestId=requestId,parameter_pt=parameter_pt))
+  return app.response_class()
 
 @app.route('/monitor/<jobguid>')
 def monitorview(jobguid):

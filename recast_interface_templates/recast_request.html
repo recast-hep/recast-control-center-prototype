@@ -68,21 +68,17 @@ $(document).ready(function(){
     })
 
 
-    $('.result-btn').click(function(){
-        var parameter_pt = $(this).attr('data-parameter-pt')
-        window.location.assign(location.origin + '/{{request_info['analysis-uuid']}}/result/{{request_info['uuid']}}/' + parameter_pt)
-    })
-
     $('.result-btn').each(function(){
         var button = $(this)
+        backend = button.attr('data-backend')
         var requestId = $(this).attr('data-parameter-pt')
         var resultsAvailable = false
-        $.ajax(location.origin+'/status/{{request_info['uuid']}}/'+requestId,{
+        $.ajax(location.origin+'/status/{{request_info['uuid']}}/'+requestId+'?backend='+backend,{
             async: false,
             complete: function(data){
                 resultsAvailable = data['responseJSON']['resultsAvailable']
                 if(!resultsAvailable){
-                    button.addClass('disabled')
+                    button.parent().addClass('disabled')
                 }                    
             }
         })
@@ -223,8 +219,18 @@ Dropzone.options.dropzone = {
                                       </ul>
                                     </div>
 
-                                    <!-- <button data-parameter-pt="{{row}}" class="btn btn-default process-btn">process</button> -->
-                                    <button data-parameter-pt="{{row}}" class="btn btn-default result-btn">Results</button>
+                                    <!-- Single button -->
+                                    <div class="btn-group">
+                                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        Results <span class="caret"></span>
+                                      </button>
+                                      <ul class="dropdown-menu" role="menu">
+                                      {% for b in backends %}
+                                        <li><a href="/resultview/{{request_info['uuid']}}/{{row}}/{{b}}" class="result-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
+                                      {% endfor %}
+                                      </ul>
+                                    </div>
+
                                 </td>
 
                             </tr>
