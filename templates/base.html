@@ -86,6 +86,17 @@ UserVoice.push(['autoprompt', {}]);
       src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     </script>
 
+    <script type="text/javascript">
+        MathJax.Hub.Config({
+          TeX: {
+            Macros: {
+              TeV: "\\mathrm{TeV}",
+              pT: "p_\\mathrm{T}",
+            }
+          }
+        });
+    </script>
+
     <!-- <script type="text/javascript" src="{{ url_for('static',filename='js/underscore-min.js')}}"></script> -->
     </head>
     <body>
