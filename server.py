@@ -117,9 +117,6 @@ from recast_interface_blueprint import recast
 
 app.register_blueprint(recast, url_prefix='/recast')
 
-from rivet_blueprint import rivetblue
-app.register_blueprint(rivetblue, url_prefix='/rivet')
-
 from recastrivet.general_rivet_blueprint import blueprint as rivetresultblue
 app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
@@ -138,10 +135,6 @@ def home():
     userinfo = session.get('user',{})
     return render_template('home.html', userinfo = userinfo)
 
-@app.route("/rivet")
-def rivethome():
-    return render_template('rivethome.html')
-
 RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
 @app.route('/status/<requestId>')
 def request_overall_status(requestId):
@@ -153,7 +146,7 @@ def request_overall_status(requestId):
 def request_point_status(requestId,parameter_pt):
   backend = request.args['backend']
   assert backend
-  resultdir = '{}/results/{}/{}'.format(RECASTSTORAGEPATH,requestId,backend)
+  resultdir = '{}/results/{}/{}/{}'.format(RECASTSTORAGEPATH,requestId,parameter_pt,backend)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 

@@ -121,17 +121,10 @@ UserVoice.push(['autoprompt', {}]);
                         </select>
                     </form> -->
     
-                    {% if page_version == "RIVET" %}
-                    <ul class="nav navbar-nav">
-                        <li id="nav-allreq"><a href="{{url_for('rivet.rivet_all_analyses_view')}}">All Analyses (Rivet)</a></li>
-                        <li id="nav-allreq"><a href="{{url_for('rivet.rivet_requests_view')}}">All Requests (Rivet)</a></li>
-                    </ul>
-                    {% else %}
                     <ul class="nav navbar-nav">
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a></li>
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
                     </ul>
-                    {% endif %}
                 
                     <ul class="nav navbar-nav navbar-right">
                     {% if session.has_key('user') %}
