@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, jsonify, request
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
 
 
+RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
+
 import json
 import requests
 import requests
@@ -149,8 +151,6 @@ def process_request_point(request_uuid,point):
   rivetanalysisname = None
   if backend == 'rivet' and (analysis_uuid not in UUIDtoRivet):
     raise NotImplementedError
-    rivetanalysisname = UUIDtoRivet[analysis_uuid]
-    print rivetanalysisname
 
   if backend == 'dedicated' and (analysis_uuid not in implemented_analyses):
     raise NotImplementedError
@@ -162,6 +162,8 @@ def process_request_point(request_uuid,point):
   jobguid = None
   chain = None
   if backend == 'rivet':
+    rivetanalysisname = UUIDtoRivet[analysis_uuid]
+    print rivetanalysisname
     assert rivetanalysisname
     jobguid, chain = recastrivet.general_rivet_backendtasks.get_chain(request_uuid,point,rivetanalysisname)
   if backend == 'dedicated':
@@ -169,12 +171,10 @@ def process_request_point(request_uuid,point):
 
   print jobguid
   print chain
-
-  return jsonify(jobguid=0) 
    
-  # result = chain.apply_async()
+  result = chain.apply_async()
 
-  # print result
+  print result
 
   return jsonify(jobguid=jobguid, task_ids = ['list of task ids']) 
   
@@ -188,7 +188,7 @@ import recastapi.response
 import zipfile
 @recast.route('/updateResponse/<request_uuid>')
 def uploadresults(request_uuid):
-  resultdir = 'results/{}'.format(request_uuid)
+  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
   response_file = '{}.zip'.format(resultdir)
   with zipfile.ZipFile(response_file,'w') as resultzip:
     zipdir(resultdir,resultzip)

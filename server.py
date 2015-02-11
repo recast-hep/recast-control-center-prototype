@@ -142,21 +142,23 @@ def home():
 def rivethome():
     return render_template('rivethome.html')
 
+RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
+
 @app.route('/status/<requestId>')
 def request_status(requestId):
-  resultdir = 'results/{}'.format(requestId)
+  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,requestId)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
 @app.route('/status/<requestId>/<parameter_pt>')
 def request_point_status(requestId,parameter_pt):
-  resultdir = 'results/{}/{}'.format(requestId,parameter_pt)
+  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,requestId)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
 @app.route('/resultfile/<requestId>/<parameter_pt>/<path:file>')
 def plots(requestId,parameter_pt,file):
-  filepath = 'results/{}/{}/{}'.format(requestId,parameter_pt,file)
+  filepath = '{}/results/{}/{}/{}'.format(RECASTSTORAGEPATH,requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
 @app.route('/monitor/<jobguid>')
