@@ -17,6 +17,7 @@ import pickle
 import pkg_resources
 
 import recastrivet
+import recastrivet.general_rivet_backendtasks
 
 from catalogue import implemented_analyses
 rivetnameToUUID = pickle.loads(pkg_resources.resource_string('recastrivet','rivetmap.pickle'))
