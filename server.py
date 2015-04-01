@@ -13,6 +13,7 @@ import os
 app = Flask('RECAST-demo')
 app.secret_key = 'somesecret'
 
+
 # Map SSO attributes from ADFS to session keys under session['user']
 SSO_ATTRIBUTE_MAP = {
   'HTTP_ADFS_LOGIN': (True, 'username'),
@@ -44,10 +45,6 @@ def login(user_info):
 def logout():
   session.pop('user')
   return redirect('/')
-
-
-
-app.debug = True
 
 import redis
 
@@ -120,7 +117,7 @@ app.register_blueprint(recast, url_prefix='/recast')
 from recastrivet.general_rivet_blueprint import blueprint as rivetresultblue
 app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
-from catalogue import implemented_analyses
+from recastbackend.catalogue import implemented_analyses
 
 for analysis_uuid,data in implemented_analyses.iteritems():
   app.register_blueprint(data['blueprint'], url_prefix='/'+analysis_uuid)
