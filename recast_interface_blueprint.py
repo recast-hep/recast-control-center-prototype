@@ -143,10 +143,7 @@ def process_request_point(request_uuid,point):
   backend = request.args['backend']
 
   from recastbackend.submission import submit_recast_request
-  submission = submit_recast_request(request_uuid,point,backend)
-
-  print submission
-  jobguid = '0000'
+  jobguid,result = submit_recast_request(request_uuid,point,backend)
 
   return jsonify(jobguid=jobguid, task_ids = ['list of task ids']) 
   

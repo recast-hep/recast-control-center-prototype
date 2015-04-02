@@ -54,6 +54,7 @@ import sqlite3
 
 
 import msgpack
+import importlib
 
 from socketio.mixins import RoomsMixin
 
@@ -119,8 +120,15 @@ app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
 from recastbackend.catalogue import implemented_analyses
 
+def get_blueprint(name):
+  module,attr = name.split(':')
+  blueprintmodule = importlib.import_module(module)  
+  return getattr(blueprintmodule,attr)
+
+
 for analysis_uuid,data in implemented_analyses.iteritems():
-  app.register_blueprint(data['blueprint'], url_prefix='/'+analysis_uuid)
+  blueprint = get_blueprint(data['blueprint'])
+  app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
   
 #
 # these are the views  
@@ -159,7 +167,7 @@ def resultview(requestId,parameter_pt,backend):
   request_info = recastapi.request.request(requestId)
   analysis_uuid = request_info['analysis-uuid']
   if backend == 'dedicated':
-    blueprintname = implemented_analyses[analysis_uuid]['blueprint'].name
+    blueprintname = get_blueprint(implemented_analyses[analysis_uuid]['blueprint']).name
     print url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt)
     return redirect(url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt))
   if backend == 'rivet':
