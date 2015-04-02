@@ -22,13 +22,13 @@ import recastrivet.general_rivet_backendtasks
 from recastbackend.catalogue import implemented_analyses
 rivetnameToUUID = pickle.loads(pkg_resources.resource_string('recastrivet','rivetmap.pickle'))
 UUIDtoRivet = {v:k for k,v in rivetnameToUUID.iteritems()}
-# for uuid in implemented_analyses.keys():
-#   UUIDtoRivet[uuid] = "DUMMY"
+#for uuid in implemented_analyses.keys():
+#    UUIDtoRivet[uuid] = "DUMMY"
 
 def getBackends(uuid):
   backends = []
   if uuid in implemented_analyses: backends+=['dedicated']
-  #if uuid in UUIDtoRivet: backends+=['rivet']
+  if uuid in UUIDtoRivet: backends+=['rivet']
   return backends
 
 @recast.route('/request/<uuid>')

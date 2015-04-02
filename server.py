@@ -115,7 +115,7 @@ from recast_interface_blueprint import recast
 
 app.register_blueprint(recast, url_prefix='/recast')
 
-from recastrivet.general_rivet_blueprint import blueprint as rivetresultblue
+from recastrivet.blueprint import blueprint as rivetresultblue
 app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
 from recastbackend.catalogue import implemented_analyses
