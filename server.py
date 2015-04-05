@@ -55,8 +55,13 @@ import sqlite3
 
 import msgpack
 import importlib
-
+import json
 from socketio.mixins import RoomsMixin
+
+import celery
+import recastbackend.messaging
+#needed to get redis connection working
+from recastbackend.productionapp import app as celery_app
 
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
   def subscriber(self):
@@ -66,6 +71,26 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     pubsub.subscribe('socket.io#emitter')
     self.emit('subscribed')
 
+    #currently we have a specific setup where we want to get the backlog of jobs
+    #not a general socketio setup with arbitrary rooms
+
+    assert len(self.session['rooms'])==1
+    celery_app.set_current()
+
+    assert celery.current_app == celery_app
+    
+    print "getting stored messages for room {}".format(self.jobguid)
+    stored = recastbackend.messaging.get_stored_messages(self.jobguid)
+
+    print "got {}".format(stored)
+
+    for m in stored:
+      old_msg_data =  json.loads(m)
+      print old_msg_data
+
+      for_emit = ['room_msg', old_msg_data]
+      self.emit(*for_emit)
+                    
     for m in pubsub.listen():
       # print m
       if m['type'] == 'message':
@@ -90,20 +115,25 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
           else:
               self.emit(*data['data'])
     
-  def on_subscribe(self):
-    self.spawn(self.subscriber)
-
   def on_helloServer(self):
     print "hello back"
     self.emit('plainEmit')
     print "emitting to room"
 
-
-  def on_join(self,data):
+  def on_subscribe(self):
+    print "not doing much on subscribe"
+    
+  def on_join_recast_jobguid(self,data):
     print "joining room: {}".format(data['room'])
+
+    self.jobguid = data['room']
+
     self.join(data['room'])
 
     self.emit('joined')
+
+    #only spawn listener after join
+    self.spawn(self.subscriber)
 
   def on_emitToRoom(self,data):
     print "emitting to room: {} and myself".format(data['room'])
@@ -119,6 +149,7 @@ from recastrivet.blueprint import blueprint as rivetresultblue
 app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
 
 from recastbackend.catalogue import implemented_analyses
+
 
 def get_blueprint(name):
   module,attr = name.split(':')

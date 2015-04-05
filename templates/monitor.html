@@ -8,11 +8,11 @@ $(document).ready(function(){
 
     socket.emit('helloServer');
     socket.emit('subscribe');
-    socket.emit('join',{room:'{{jobguid}}'});
+    socket.emit('join_recast_jobguid',{room:'{{jobguid}}'});
     socket.on('room_msg', function (data) {
             console.log('got msg from room');
             console.log(data)
-            $('.logwindow').prepend('<span class="logdatetime">'+data['date']+'</span><span>'+data['msg']+'</span>\n')
+            $('.logwindow').append('<span class="logdatetime">'+data['date']+'</span><span>'+data['msg']+'</span>\n')
 	    if(data['msg']=='done'){window.history.back();}
         });
 
