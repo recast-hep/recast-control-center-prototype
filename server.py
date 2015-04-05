@@ -220,5 +220,5 @@ def socketio(remaining):
 
 from socketio.server import SocketIOServer, serve
 
-if __name__ == "__main__":
-  serve(app, port = 8000, host = '0.0.0.0')
+def do_serve():
+  serve(app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
