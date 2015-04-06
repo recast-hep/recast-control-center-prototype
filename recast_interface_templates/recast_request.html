@@ -31,22 +31,6 @@ $(document).ready(function(){
         }
     })
 
-
-    $('.process-btn').each(function(){
-        var button = $(this)
-        var analysisImplemented = false
-        $.ajax(location.origin+'/recast/analysis_status/{{request_info['analysis-uuid']}}',{
-            async: false,
-            complete: function(data){
-                analysisImplemented = data['responseJSON']['analysisImplemented']
-                if(!analysisImplemented){
-                    button.addClass('disabled')
-                }
-            }
-        })
-    })
-
-
     $('.process-btn').click(function(){
         parameter_pt = $(this).attr('data-parameter-pt')
         backend = $(this).attr('data-backend')
@@ -192,59 +176,95 @@ Dropzone.options.dropzone = {
     <div class="col-md-12">
         <div class="panel panel-default">
 
-            <table id="parameter-points-table" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Desciption</th>
-                        <th>Number of Events</th>
-                        <th>Cross-Section</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if request_info['parameter-points']%}
-                        {% for row,row_info in request_info['parameter-points'].iteritems() %}
+
+    {% if request_info['parameter-points']%}
+
+    <table id="whatwhat" class="table table-hover">
+        <thead>
+            <tr>
+                <span class="col-md-2" style="display:inline-block  ">Parameter</span>
+                <span class="col-md-2" style="display:inline-block  ">Desciption</span>
+                <span class="col-md-2" style="display:inline-block  ">Number of Events</span>
+                <span class="col-md-2" style="display:inline-block  ">Cross-Section</span>
+                <span class="col-md-3" style="display:inline-block  ">Actions</span>
+            </tr>
+        </thead>
+
+        {% for row,row_info in request_info['parameter-points'].iteritems() %}
+
+        {% set joblist = status_info[row] %}
+
+        <tr>
+            <td class="col-md-11">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordion_{{loop.index}}">
+                    <span style="display:inline-block" class="col-md-2">{{row}}</span>
+                </a>
+                <span style="display:inline-block" class="col-md-2">{{row_info['point-name']}}</span>
+                <span style="display:inline-block" class="col-md-2">{{row_info['run-condition'][0]['number-of-events']}}</span>
+                <span style="display:inline-block" class="col-md-2">{{row_info['run-condition'][0]['reference-x-section']}}</span>
+                <span style="display:inline-block" class="col-md-3">
+                    
+                    <!-- Single button -->
+                    <div class="btn-group process-group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Process <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      {% for b in backends %}
+                        <li><a href="#" class="process-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                    <!-- Single button -->
+                    <div class="btn-group results-group">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Results <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      {% for b in backends %}
+                        <li><a href="/resultview/{{request_info['uuid']}}/{{row}}/{{b}}" class="result-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                </span>
+
+                <div id="accordion_{{loop.index}}" class="detail_point_info collapse">
+                    <div class="col-md-10">
+                        <div class="col-md-10">
+                        <p>processings of this parameter point</p>
+                        <table class="table table-bordered table-condensed col-md-10">
+                        <thead>
                             <tr>
-                                <td>{{row}}</td>
-                                <td>{{row_info['point-name']}}</td>
-                                <td>{{row_info['run-condition'][0]['number-of-events']}}</td>
-                                <td>{{row_info['run-condition'][0]['reference-x-section']}}</td>
-                                <td>
-                                    <!-- Single button -->
-                                    <div class="btn-group process-group">
-                                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        Process <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                      {% for b in backends %}
-                                        <li><a href="#" class="process-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
-                                      {% endfor %}
-                                      </ul>
-                                    </div>
-                                    <!-- Single button -->
-                                    <div class="btn-group results-group">
-                                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        Results <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                      {% for b in backends %}
-                                        <li><a href="/resultview/{{request_info['uuid']}}/{{row}}/{{b}}" class="result-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
-                                      {% endfor %}
-                                      </ul>
-                                    </div>
-
-                                </td>
-
+                                <th class="col-md-6">job ID</th>
+                                <th class="col-md-2">backend</th>
+                                <th class="col-md-2">state</th>
                             </tr>
+                        </thead>
+                        {% for jobinfo in joblist %}
+                          <tr>
+                              <td class="col-md-6"><a href="/monitor/{{jobguid}}">{{jobinfo['job']}}</a></td>
+                              <td class="col-md-2">{{jobinfo['backend']}}</td>
+                              <td class="col-md-2">{{jobinfo['celery']}}</td>
+                          </tr>
                         {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
-            <div class="panel-footer"></div>
+                        </table>
+                        </div>
+                
+                    </div>
+                </div> 
+            </td>
+        </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+    
         </div> <!-- panel -->
     </div> <!-- col -->
 </div> <!-- row -->
+
+
+
+
 
 
 <div id="themodal" class="modal fade">

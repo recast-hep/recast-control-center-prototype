@@ -1,41 +1,42 @@
-from flask import Blueprint, render_template, jsonify, request
-recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
-
-
-RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
-
 import json
 import requests
-import requests
 import os
-from zipfile import ZipFile
 import glob
+import recastapi.response
+import zipfile
 
 import recastapi.request 
 import recastapi.analysis 
 import pickle
 import pkg_resources
+from flask import Blueprint, render_template, jsonify, request
 
-import recastrivet
-import recastrivet.general_rivet_backendtasks
+from recastbackend.catalogue import getBackends
 
-from recastbackend.catalogue import implemented_analyses
-rivetnameToUUID = pickle.loads(pkg_resources.resource_string('recastrivet','rivetmap.pickle'))
-UUIDtoRivet = {v:k for k,v in rivetnameToUUID.iteritems()}
-#for uuid in implemented_analyses.keys():
-#    UUIDtoRivet[uuid] = "DUMMY"
+RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
+recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
 
-def getBackends(uuid):
-  backends = []
-  if uuid in implemented_analyses: backends+=['dedicated']
-  if uuid in UUIDtoRivet: backends+=['rivet']
-  return backends
 
 @recast.route('/request/<uuid>')
 def recast_request_view(uuid):
   request_info = recastapi.request.request(uuid)
   analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
-  return render_template('recast_request.html', request_info = request_info, analysis_info = analysis_info, backends = getBackends(request_info['analysis-uuid']))
+
+
+  result = [{'backend': 'dedicated',
+    'celery': 'SUCCESS',
+    'job': 'bcca27ee-dc2c-11e4-a6d5-02163e008f91'},
+   {'backend': 'dedicated',
+    'celery': 'PENDING',
+    'job': 'eff66e02-dc2c-11e4-a6d5-02163e008f91'}]
+
+  points = request_info['parameter-points'].keys()
+  status_info = {point:result for point in points}
+
+  return render_template('recast_request.html', request_info  = request_info,
+                                                analysis_info = analysis_info, 
+                                                backends      = getBackends(request_info['analysis-uuid']),
+                                                status_info   = status_info)
 
 @recast.route('/requests')
 def recast_requests_view():
@@ -55,14 +56,8 @@ def recast_analyses_view():
   implemented = [x for x in reversed(analyses_info) if backends[x['uuid']]]
   notimplemented = [x for x in reversed(analyses_info) if not backends[x['uuid']]]
 
-  return  render_template('recast_all_analyses.html', implemented = implemented, notimplemented = notimplemented, backends = backends)
+  return  render_template('recast_all_analyses.html',implemented  = implemented, notimplemented = notimplemented, backends = backends)
 
-@recast.route('/analysis_status/<analysis_uuid>')
-def status(analysis_uuid):
-  available =  (analysis_uuid in implemented_analyses)
-  return jsonify(analysisImplemented=available)
-
-import IPython
 @recast.route('/upload',methods = ['POST','GET'])
 def upload():
   #rudimentary.. better: http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
@@ -91,7 +86,7 @@ def upload():
     zippedfile = '{}/my.zip'.format(uploaddir)
     print "zipping my own zipfile: {}".format(zippedfile)
   
-    with ZipFile(zippedfile,'w') as zipfile:
+    with zipfile.ZipFile(zippedfile,'w') as zipfile:
       for file in glob.glob('{}/*'.format(uploaddir)):
         if(os.path.basename(file)!=os.path.basename(zippedfile)):
   	      zipfile.write(file,os.path.basename(file))
@@ -155,8 +150,6 @@ def zipdir(path, zip):
         for file in files:
             zip.write(os.path.join(root, file),os.path.join(root, file).split('/',2)[-1])
        
-import recastapi.response
-import zipfile
 @recast.route('/updateResponse/<request_uuid>')
 def uploadresults(request_uuid):
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)

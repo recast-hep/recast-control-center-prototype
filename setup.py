@@ -19,7 +19,9 @@ setup(
     'recast-dmhiggs-demo',
     'recast-rivet-recaster-demo',
     'recast-hype-demo',
-    'recast-api'
+    'recast-api',
+    'Flask',
+    'Flask-SSO'
   ],
   dependency_links = [
     'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-python-emitter-0.1.3',

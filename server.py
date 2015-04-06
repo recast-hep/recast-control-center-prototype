@@ -1,14 +1,49 @@
 import gevent
 from gevent import monkey; monkey.patch_all()
 
+import uuid
+import os
+import redis
+import time
+import sqlite3
+import msgpack
+import importlib
+import json
+import recastapi
+import json
+
 from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for
+from flask_sso import SSO
 
 from socketio.namespace import BaseNamespace
 from socketio import socketio_manage
+from socketio.server import SocketIOServer, serve
+
 from celery.result import BaseAsyncResult
 
-import uuid
-import os
+from socketio.mixins import RoomsMixin
+
+import celery
+import recastbackend.messaging
+
+#needed to get redis connection working
+from recastbackend.productionapp import app as celery_app
+
+####
+# blueprints
+####
+
+#general recast views
+from recast_interface_blueprint import recast
+
+#list of dedicated backends that includes blueprint information
+from recastbackend.catalogue import all_backend_catalogue
+
+def get_blueprint(name):
+  module,attr = name.split(':')
+  blueprintmodule = importlib.import_module(module)  
+  return getattr(blueprintmodule,attr)
+
 
 app = Flask('RECAST-demo')
 app.secret_key = 'somesecret'
@@ -33,7 +68,6 @@ SSO_ATTRIBUTE_MAP = {
 app.config.setdefault('SSO_ATTRIBUTE_MAP', SSO_ATTRIBUTE_MAP)
 app.config.setdefault('SSO_LOGIN_URL', '/login')
 
-from flask_sso import SSO
 ext = SSO(app=app)
 
 @ext.login_handler
@@ -45,23 +79,6 @@ def login(user_info):
 def logout():
   session.pop('user')
   return redirect('/')
-
-import redis
-
-import IPython
-import time
-import sqlite3
-
-
-import msgpack
-import importlib
-import json
-from socketio.mixins import RoomsMixin
-
-import celery
-import recastbackend.messaging
-#needed to get redis connection working
-from recastbackend.productionapp import app as celery_app
 
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
   def subscriber(self):
@@ -141,25 +158,12 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     self.emit_to_room(data['room'],'room_msg',data['msg'])
 
 
-from recast_interface_blueprint import recast
-
 app.register_blueprint(recast, url_prefix='/recast')
 
-from recastrivet.blueprint import blueprint as rivetresultblue
-app.register_blueprint(rivetresultblue, url_prefix='/rivetresult')
-
-from recastbackend.catalogue import implemented_analyses
-
-
-def get_blueprint(name):
-  module,attr = name.split(':')
-  blueprintmodule = importlib.import_module(module)  
-  return getattr(blueprintmodule,attr)
-
-
-for analysis_uuid,data in implemented_analyses.iteritems():
-  blueprint = get_blueprint(data['blueprint'])
-  app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
+for backend,analysis_list in all_backend_catalogue.iteritems():
+  for analysis_uuid,data in analysis_list.iteritems():
+    blueprint = get_blueprint(data['blueprint'])
+    app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
   
 #
 # these are the views  
@@ -191,20 +195,15 @@ def plots(requestId,parameter_pt,file):
   filepath = '{}/results/{}/{}/{}'.format(RECASTSTORAGEPATH,requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
-import recastapi
-import json
 @app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
 def resultview(requestId,parameter_pt,backend):
   request_info = recastapi.request.request(requestId)
   analysis_uuid = request_info['analysis-uuid']
-  if backend == 'dedicated':
-    blueprintname = get_blueprint(implemented_analyses[analysis_uuid]['blueprint']).name
-    print url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt)
-    return redirect(url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt))
-  if backend == 'rivet':
-    print url_for('general_rivet.result_view',requestId=requestId,parameter_pt=parameter_pt)
-    return redirect(url_for('general_rivet.result_view',requestId=requestId,parameter_pt=parameter_pt))
-  return app.response_class()
+
+  blueprintname = get_blueprint(all_backend_catalogue[backend][analysis_uuid]['blueprint']).name
+  print url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt)
+  return redirect(url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt))
+
 
 @app.route('/monitor/<jobguid>')
 def monitorview(jobguid):
@@ -218,7 +217,8 @@ def socketio(remaining):
     })
     return app.response_class()
 
-from socketio.server import SocketIOServer, serve
-
 def do_serve():
   serve(app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
+
+if __name__ == '__main__':
+  do_serve()
