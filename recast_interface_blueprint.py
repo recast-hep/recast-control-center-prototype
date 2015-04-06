@@ -12,6 +12,10 @@ import pkg_resources
 from flask import Blueprint, render_template, jsonify, request
 
 from recastbackend.catalogue import getBackends
+from recastbackend.productionapp import app as celery_app
+celery_app.set_current()
+
+import recastbackend.jobstate
 
 RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
@@ -22,16 +26,8 @@ def recast_request_view(uuid):
   request_info = recastapi.request.request(uuid)
   analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
 
-
-  result = [{'backend': 'dedicated',
-    'celery': 'SUCCESS',
-    'job': 'bcca27ee-dc2c-11e4-a6d5-02163e008f91'},
-   {'backend': 'dedicated',
-    'celery': 'PENDING',
-    'job': 'eff66e02-dc2c-11e4-a6d5-02163e008f91'}]
-
   points = request_info['parameter-points'].keys()
-  status_info = {point:result for point in points}
+  status_info = {point:recastbackend.jobstate.get_flattened_jobs(celery_app,uuid,point) for point in points}
 
   return render_template('recast_request.html', request_info  = request_info,
                                                 analysis_info = analysis_info, 

@@ -72,6 +72,12 @@ $(document).ready(function(){
             $(this).children().filter('button').addClass('disabled')
         }
     })
+
+    {% if not session.has_key('user') %}
+       $('.process-group button').addClass('disabled')
+    {% endif %}
+
+
 });
 </script>
 
@@ -242,7 +248,7 @@ Dropzone.options.dropzone = {
                         </thead>
                         {% for jobinfo in joblist %}
                           <tr>
-                              <td class="col-md-6"><a href="/monitor/{{jobguid}}">{{jobinfo['job']}}</a></td>
+                              <td class="col-md-6"><a href="/monitor/{{jobinfo['job']}}">{{jobinfo['job']}}</a></td>
                               <td class="col-md-2">{{jobinfo['backend']}}</td>
                               <td class="col-md-2">{{jobinfo['celery']}}</td>
                           </tr>
