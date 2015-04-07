@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-  name = 'recast-frontend-prototype',
+  name = 'recast-control-center-prototype',
   version = '0.0.1',
   description = 'prototype web frontend for RECAST project at CERN',
   long_description = 'prototype web frontend for RECAST project at CERN. Provides users with options to request new RECAST requests, process them using a backend, and display results.',
@@ -15,19 +15,23 @@ setup(
     'gevent',
     'gevent-socketio',
     'msgpack-python',
-    'socket.io-python-emitter',
-    'recast-dmhiggs-demo',
-    'recast-rivet-recaster-demo',
-    'recast-hype-demo',
+    'socket.io-emitter',
     'recast-api',
+    'recast-backend',
     'Flask',
     'Flask-SSO'
   ],
+  entry_points = {
+    'console_scripts': [
+      'recast-control-center = recastcontrolcenter.server:do_serve'
+    ]
+  },
+  include_package_data = True,
+  zip_safe=False,
   dependency_links = [
-    'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-python-emitter-0.1.3',
-    'https://github.com/recast-hep/recast-dmhiggs-demo/tarball/master#egg=recast-dmhiggs-demo-0.0.1',
-    'https://github.com/recast-hep/recast-rivet-recaster-demo/tarball/master#egg=recast-rivet-recaster-demo-0.0.1',
-    'https://github.com/recast-hep/recast-hype-demo/tarball/master#egg=recast-hype-demo-0.0.1',
-    'https://github.com/recast-hep/recast-api/tarball/master#egg=recast-api-0.0.1'
+    'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-emitter-0.1.3',
+    'https://github.com/recast-hep/recast-api/tarball/master#egg=recast-api-0.0.1',
+    'https://github.com/recast-hep/recast-backend/tarball/master#egg=recast-backend-0.0.1'
+    
   ]
 )

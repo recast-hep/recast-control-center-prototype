@@ -25,7 +25,7 @@ from socketio.mixins import RoomsMixin
 
 import celery
 import recastbackend.messaging
-
+import pkg_resources
 #needed to get redis connection working
 from recastbackend.productionapp import app as celery_app
 
@@ -45,8 +45,10 @@ def get_blueprint(name):
   return getattr(blueprintmodule,attr)
 
 
-app = Flask('RECAST-demo')
-app.secret_key = 'somesecret'
+templates_path = pkg_resources.resource_filename('recastcontrolcenter','templates')
+static_path = pkg_resources.resource_filename('recastcontrolcenter','static')
+
+flask_app = Flask('RECAST-demo',instance_relative_config = True,template_folder = templates_path, static_folder = static_path)
 
 
 # Map SSO attributes from ADFS to session keys under session['user']
@@ -65,17 +67,17 @@ SSO_ATTRIBUTE_MAP = {
   # 'ADFS_IDENTITYCLASS': (False, 'external'),
   # 'HTTP_SHIB_AUTHENTICATION_METHOD': (False, 'authmethod'),
   }
-app.config.setdefault('SSO_ATTRIBUTE_MAP', SSO_ATTRIBUTE_MAP)
-app.config.setdefault('SSO_LOGIN_URL', '/login')
+flask_app.config.setdefault('SSO_ATTRIBUTE_MAP', SSO_ATTRIBUTE_MAP)
+flask_app.config.setdefault('SSO_LOGIN_URL', '/login')
 
-ext = SSO(app=app)
+ext = SSO(app=flask_app)
 
 @ext.login_handler
 def login(user_info):
   session['user'] = user_info
   return redirect('/')
 
-@app.route('/logout')
+@flask_app.route('/logout')
 def logout():
   session.pop('user')
   return redirect('/')
@@ -158,17 +160,17 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     self.emit_to_room(data['room'],'room_msg',data['msg'])
 
 
-app.register_blueprint(recast, url_prefix='/recast')
+flask_app.register_blueprint(recast, url_prefix='/recast')
 
 for backend,analysis_list in all_backend_catalogue.iteritems():
   for analysis_uuid,data in analysis_list.iteritems():
     blueprint = get_blueprint(data['blueprint'])
-    app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
+    flask_app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
   
 #
 # these are the views  
 #
-@app.route("/")
+@flask_app.route("/")
 def home():
     # if(session.has_key('user')): session.pop('user')
     # session['user'] =  {'username':'lukas'}
@@ -176,13 +178,13 @@ def home():
     return render_template('home.html', userinfo = userinfo)
 
 RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
-@app.route('/status/<requestId>')
+@flask_app.route('/status/<requestId>')
 def request_overall_status(requestId):
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,requestId)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
-@app.route('/status/<requestId>/<parameter_pt>')
+@flask_app.route('/status/<requestId>/<parameter_pt>')
 def request_point_status(requestId,parameter_pt):
   backend = request.args['backend']
   assert backend
@@ -190,12 +192,12 @@ def request_point_status(requestId,parameter_pt):
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
-@app.route('/resultfile/<requestId>/<parameter_pt>/<path:file>')
+@flask_app.route('/resultfile/<requestId>/<parameter_pt>/<path:file>')
 def plots(requestId,parameter_pt,file):
   filepath = '{}/results/{}/{}/{}'.format(RECASTSTORAGEPATH,requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
-@app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
+@flask_app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
 def resultview(requestId,parameter_pt,backend):
   request_info = recastapi.request.request(requestId)
   analysis_uuid = request_info['analysis-uuid']
@@ -205,20 +207,20 @@ def resultview(requestId,parameter_pt,backend):
   return redirect(url_for('{}.result_view'.format(blueprintname),requestId=requestId,parameter_pt=parameter_pt))
 
 
-@app.route('/monitor/<jobguid>')
+@flask_app.route('/monitor/<jobguid>')
 def monitorview(jobguid):
   return render_template('monitor.html', jobguid = jobguid)
 
-@app.route('/socket.io/<path:remaining>')
+@flask_app.route('/socket.io/<path:remaining>')
 def socketio(remaining):
     print "socket io route called"
     socketio_manage(request.environ, {
         '/monitor': MonitoringNamespace
     })
-    return app.response_class()
+    return flask_app.response_class()
 
 def do_serve():
-  serve(app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
+  serve(flask_app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
 
 if __name__ == '__main__':
   do_serve()
