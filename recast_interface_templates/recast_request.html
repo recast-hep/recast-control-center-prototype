@@ -250,8 +250,16 @@ Dropzone.options.dropzone = {
                           <tr>
                               <td class="col-md-6"><a href="/monitor/{{jobinfo['job']}}">{{jobinfo['job']}}</a></td>
                               <td class="col-md-2">{{jobinfo['backend']}}</td>
-                              <td class="col-md-2">{{jobinfo['celery']}}</td>
-                          </tr>
+				{% if jobinfo['celery'] == 'SUCCESS' %}
+                                <td class="col-md-2 bg-success">{{jobinfo['celery']}}</td>
+				{% elif  jobinfo['celery'] == 'FAILURE' %} 
+                                <td class="col-md-2 bg-danger">{{jobinfo['celery']}}</td>
+				{% elif  jobinfo['celery'] == 'PENDING' %} 
+                                <td class="col-md-2 bg-info">{{jobinfo['celery']}}</td>
+                                {% else %}
+                                <td class="col-md-2">{{jobinfo['celery']}}</td>
+                                {% endif %}
+                        </tr>
                         {% endfor %}
                         </table>
                         </div>

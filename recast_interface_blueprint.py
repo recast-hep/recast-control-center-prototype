@@ -26,7 +26,9 @@ def recast_request_view(uuid):
   request_info = recastapi.request.request(uuid)
   analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
 
-  points = request_info['parameter-points'].keys()
+
+  parpoints = request_info['parameter-points']
+  points = parpoints.keys() if parpoints else []
   status_info = {point:recastbackend.jobstate.get_flattened_jobs(celery_app,uuid,point) for point in points}
 
   return render_template('recast_request.html', request_info  = request_info,
@@ -82,10 +84,10 @@ def upload():
     zippedfile = '{}/my.zip'.format(uploaddir)
     print "zipping my own zipfile: {}".format(zippedfile)
   
-    with zipfile.ZipFile(zippedfile,'w') as zipfile:
+    with zipfile.ZipFile(zippedfile,'w') as zip_file:
       for file in glob.glob('{}/*'.format(uploaddir)):
         if(os.path.basename(file)!=os.path.basename(zippedfile)):
-  	      zipfile.write(file,os.path.basename(file))
+  	      zip_file.write(file,os.path.basename(file))
 
   r = recastapi.request.add_parameter_point(requestuuid,username,description,nevents,xsec,zippedfile)
   
