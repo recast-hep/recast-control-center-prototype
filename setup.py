@@ -19,11 +19,13 @@ setup(
     'recast-api',
     'recast-backend',
     'Flask',
-    'Flask-SSO'
+    'Flask-SSO',
+    'Click'
   ],
   entry_points = {
     'console_scripts': [
-      'recast-control-center = recastcontrolcenter.server:do_serve'
+      'recast-control-center = recastcontrolcenter.server:do_serve',
+      'recast-admin = recastcontrolcenter.admin.recastadmin:recastadmin'
     ]
   },
   include_package_data = True,
