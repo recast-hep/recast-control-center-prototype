@@ -39,14 +39,6 @@ def recast_request_view(uuid):
 @recast.route('/requests')
 def recast_requests_view():
   requests_info = recastapi.request.request()
-
-  from recastcontrolcenter.server import db
-  from recastdb.models import Processing
-  import uuid
-
-  db.session.add(Processing(jobguid = str(uuid.uuid1()), chainresult = str(uuid.uuid1())))
-  db.session.commit()
-
   return render_template('recast_all_requests.html', requests_info = reversed(requests_info))
 
 @recast.route('/analysis/<uuid>')
