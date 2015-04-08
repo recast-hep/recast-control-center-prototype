@@ -18,9 +18,10 @@ setup(
     'socket.io-emitter',
     'recast-api',
     'recast-backend',
+    'recast-database',
     'Flask',
     'Flask-SSO',
-    'Click'
+    'Click',
   ],
   entry_points = {
     'console_scripts': [
@@ -33,6 +34,7 @@ setup(
   dependency_links = [
     'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-emitter-0.1.3',
     'https://github.com/recast-hep/recast-api/tarball/master#egg=recast-api-0.0.1',
+    'https://github.com/recast-hep/recast-database/tarball/master#egg=recast-database-0.0.1',
     'https://github.com/recast-hep/recast-backend/tarball/master#egg=recast-backend-0.0.1'
     
   ]
