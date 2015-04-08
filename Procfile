@@ -1,2 +1,2 @@
-web: PYTHONUNBUFFERED=true python -c 'import server;server.do_serve()'
+web: PYTHONUNBUFFERED=true recast-control-center
 redis: redis-server
