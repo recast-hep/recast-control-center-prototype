@@ -23,8 +23,10 @@ RUN pip install PyColorizer \
 WORKDIR /code
 ADD . /code
 
+EXPOSE 8000
+
 # Install recast:
-RUN pip install --process-dependency-links -e .
+RUN pip install --process-dependency-links .
 
 # Run container as user `recast` with UID `1000`, which should match
 # current host user in most situations:
@@ -33,4 +35,4 @@ RUN adduser --uid 1000 --disabled-password --gecos '' recast && \
 
 # Start the application:
 USER recast
-CMD ["python", "server.py"]
+CMD ["recast-control-center"]

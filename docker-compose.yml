@@ -1,6 +1,6 @@
 web:
   build: .
-  command: python server.py
+  command: recast-control-center
   ports:
    - "8000:8000"
   environment:
