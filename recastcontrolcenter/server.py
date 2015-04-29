@@ -6,6 +6,7 @@ import importlib
 import pkg_resources
 import recastapi.request
 import flask
+import recastcontrolcenter.backendtasks as asynctasks
 
 from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for, abort
 from flask_sso import SSO
@@ -16,6 +17,8 @@ from recast_interface_blueprint import recast
 from recastbackend.catalogue import all_backend_catalogue
 from recastbackend.productionapp import app as celery_app
 from recastdb.database import db
+
+
 
 def get_blueprint(name):
   module,attr = name.split(':')
@@ -227,9 +230,8 @@ zippedfile: {zippedfile}
   zippedfile = zipfilename,
   description = description
 )
-    from uploadtask import upload_in_background
     celery_app.set_current()
-    upload_in_background.delay(requestuuid,username,description,nevents,xsec,zipfilename)
+    asynctasks.upload_in_background.delay(requestuuid,username,description,nevents,xsec,zipfilename)
     
 def do_serve():
   serve(flask_app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
