@@ -171,9 +171,18 @@ def uploadresults(request_uuid):
   recastapi.response.update(response_uuid,response_file)
   return jsonify(success = 'ok')
 
+import recastcontrolcenter.backendtasks as asynctasks
+from recastbackend.productionapp import app as celery_app
+
+
 @recast.route('/uploadzenodo/<request_uuid>')
 def uploadresultszenodo(request_uuid):
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
+  print 'setting celery app as current'
+  celery_app.set_current()
 
+  print 'uploading'
+  asynctasks.uploadallzenodo.delay(resultdir,request_uuid)
+  print 'leaving'
   return jsonify(depositionid = 123)
 

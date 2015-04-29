@@ -19,7 +19,7 @@ def upload_in_background(requestuuid,username,description,nevents,xsec,zipfilena
     raise
   print "upload status: {}".format(r.ok)  
 
-ACCESS_TOKEN = 'klKu45hl6Ysh4mzGC65BSXnVJTmpNI8QMYqGxrUpim9w5yP5xgdnsf57ojZ2'
+ACCESS_TOKEN = os.environ['ZENODO_TOKEN']
 
 def createdeposition(requestuuid):
   log.info('hello')
