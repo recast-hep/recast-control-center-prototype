@@ -170,3 +170,10 @@ def uploadresults(request_uuid):
     
   recastapi.response.update(response_uuid,response_file)
   return jsonify(success = 'ok')
+
+@recast.route('/uploadzenodo/<request_uuid>')
+def uploadresultszenodo(request_uuid):
+  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
+
+  return jsonify(depositionid = 123)
+

@@ -20,6 +20,18 @@ $(document).ready(function(){
 
     })
 
+
+    $('#upload-zenodo-response-btn').click(function(){
+       $('#upload-zenodo-modal').modal()
+    })
+
+    $('#trigger-zenodo-upload-btn').click(function(){
+        url = location.origin+'/recast/uploadzenodo/{{request_info['uuid']}}'
+        $.ajax(url,{async: false,
+        complete: function(data){console.log(data['responseJSON'])}})
+    })
+
+
     var requestResultsAvailable = false
     $.ajax(location.origin+'/status/{{request_info['uuid']}}',{
         async: false,
@@ -27,6 +39,7 @@ $(document).ready(function(){
             requestResultsAvailable = data['responseJSON']['resultsAvailable']
             if(!requestResultsAvailable){
                 $('#upload-response-btn').addClass('disabled')
+                // $('#upload-zenodo-response-btn').addClass('disabled')
             }                    
         }
     })
@@ -171,6 +184,9 @@ Dropzone.options.dropzone = {
             
             <button id="upload-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
               <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to RECAST</span>
+            </button>    
+            <button id="upload-zenodo-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to Zenodo</span>
             </button>    
             </p>
 
@@ -334,6 +350,22 @@ Dropzone.options.dropzone = {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="upload-zenodo-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+           <h4 class="modal-title">Success</h4>
+      </div>
+      <div class="modal-body">
+          Once results are uploaded to Zenodo, no more data points can be added.
+      </div>
+      <div class="modal-footer">
+        <button id='trigger-zenodo-upload-btn'type="button" class="btn btn-primary" data-dismiss="modal">Upload</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
