@@ -1,19 +1,20 @@
 import gevent
 from gevent import monkey; monkey.patch_all()
-
+import json
 import os
 import importlib
 import pkg_resources
 import recastapi.request
 import flask
 
-from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for
+from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for, abort
 from flask_sso import SSO
 from socketio import socketio_manage
 from socketio.server import serve
 from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
 from recastbackend.catalogue import all_backend_catalogue
+from recastbackend.productionapp import app as celery_app
 from recastdb.database import db
 
 def get_blueprint(name):
@@ -109,5 +110,126 @@ def socketio(remaining):
     })
     return flask_app.response_class()
 
+import yaml
+import glob
+import subprocess
+import zipfile
+import shutil
+import hmac
+import hashlib
+
+REPO_PATH =  '/home/analysis/recast/recast-github-webhooks'
+@flask_app.route('/github', methods = ['POST'])
+def webhookresponse():
+  provided_sig = request.headers.get('X-Hub-Signature')
+  mac = hmac.new(os.environ['GITHUBSECRET'], msg=request.data, digestmod=hashlib.sha1)
+  validate = 'sha1={}'.format(mac.hexdigest()) == provided_sig
+  if not validate:
+    abort(401)
+
+  jsondata = json.loads(request.data)
+  print 'got jason data {}'.format(jsondata)
+
+  git_id = jsondata['commits'][0]['id']
+
+  print "checking out"
+  subprocess.call('cd  {} && git pull'.format(REPO_PATH), shell = True)
+
+  recast_requests = filter(lambda filename:'requestinfo.yaml' in filename,jsondata['commits'][0]['added'])
+
+  for recast_request in recast_requests:
+    processrequest(recast_request)
+
+  return jsonify(hello = 'from recast')
+
+def processrequest(requestinfofile):
+  print "process request"
+  requestdata = yaml.load(open('{}/{}'.format(REPO_PATH,requestinfofile)))
+  print requestdata['requestor']
+  print '''\
+=========
+username: {username}
+analysis-uuid: {analysis}
+model-tyle: {modeltype}
+title: {title}
+model: {model}
+reason for request: {reason}
+'''.format(username = requestdata['requestor'],
+           analysis = requestdata['analysis-uuid'],
+           modeltype = requestdata['model-type'],
+           title = requestdata['title'],
+           model = requestdata['model'],
+           reason = requestdata['reason for request'],
+           )
+
+  audience = 'selective'
+  subscribers = ['backend-{}'.format(b) for b in requestdata['backends']]
+  print subscribers
+  #create request and get request uuid:
+  r = recastapi.request.create(requestdata['requestor'],
+                               requestdata['analysis-uuid'],
+                               requestdata['model-type'],
+                               requestdata['title'],
+                               requestdata['model'],
+                               requestdata['reason for request'],
+                               audience = audience,
+                               activate = True,
+                               subscribers = subscribers)
+
+  requestuuid = json.loads(r.content)
+
+  request_name = os.path.basename(os.path.dirname(requestinfofile))
+
+  zipbasefolder = 'github_zips/{}'.format(request_name)
+  if(os.path.exists(zipbasefolder)):
+     shutil.rmtree(zipbasefolder)
+  os.makedirs(zipbasefolder)
+
+  
+  parpoints = requestdata['parameter points']
+  for point in parpoints:
+    xsec = point['cross section']
+    description = point['point description']
+    nevents =  point['number of events']
+    username = requestdata['requestor']
+    pointdir = '{repo}/{path}/{directory}'.format(
+                repo = REPO_PATH,
+                path = os.path.dirname(requestinfofile),
+                directory = point['directory name'])
+    pointfiles =  glob.glob('{}/*'.format(pointdir))
+    for file in pointfiles:
+      if(os.path.exists(file)):
+        print 'file exists: {}'.format(file)
+      else:
+        print 'file missing: {}'.format(file)
+        
+    zipfilename =     '{}/{}_{}.zip'.format(zipbasefolder,request_name,point['directory name'])
+  
+    
+    with zipfile.ZipFile(zipfilename,'w') as zip_file:
+      for file in pointfiles:
+        if(os.path.basename(file)!=os.path.basename(zipfilename)):
+          zip_file.write(file,os.path.basename(file))
+
+    print '''\
+-----------
+requestuuid: {requestuuid}
+username: {username}
+description: {description}
+nevents: {nevents}
+xsec: {xsec}
+zippedfile: {zippedfile}
+'''.format(
+  requestuuid = requestuuid,
+  username = requestdata['requestor'],
+  nevents = nevents,
+  xsec = xsec,
+  zippedfile = zipfilename,
+  description = description
+)
+    from uploadtask import upload_in_background
+    celery_app.set_current()
+    upload_in_background.delay(requestuuid,username,description,nevents,xsec,zipfilename)
+    
 def do_serve():
   serve(flask_app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')
