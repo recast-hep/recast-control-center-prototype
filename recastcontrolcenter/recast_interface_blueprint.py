@@ -150,6 +150,8 @@ def zipdir(path, zip):
        
 @recast.route('/updateResponse/<request_uuid>')
 def uploadresults(request_uuid):
+  if not session.has_key('user'):
+    return jsonify(error = 'not authorized')
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
   response_file = '{}.zip'.format(resultdir)
   with zipfile.ZipFile(response_file,'w') as resultzip:
