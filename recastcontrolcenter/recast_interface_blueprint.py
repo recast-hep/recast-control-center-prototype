@@ -58,6 +58,8 @@ def recast_analyses_view():
 
 @recast.route('/upload',methods = ['POST','GET'])
 def upload():
+  if not session.has_key('user'):
+     return jsonify(error = 'not authorized')
   #rudimentary.. better: http://flask.pocoo.org/docs/0.10/patterns/fileuploads/#uploading-files
   mode = request.form.get('mode',None)
 

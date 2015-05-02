@@ -30,7 +30,12 @@ $(document).ready(function(){
         $.ajax(url,{async: false,
         complete: function(data){console.log(data['responseJSON'])}})
     })
-
+    
+    {% if not session.has_key('user') %}
+       $('#add-parameter-point-btn').addClass('disabled')
+       $('#upload-response-btn').addClass('disabled')
+       $('#upload-zenodo-response-btn').addClass('disabled')
+    {% endif  %}
 
     var requestResultsAvailable = false
     $.ajax(location.origin+'/status/{{request_info['uuid']}}',{
@@ -186,7 +191,7 @@ Dropzone.options.dropzone = {
               <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to RECAST</span>
             </button>    
             <button id="upload-zenodo-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
-              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to Zenodo</span>
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Mint DOI</span>
             </button>    
             </p>
 
