@@ -177,6 +177,8 @@ from recastbackend.productionapp import app as celery_app
 
 @recast.route('/uploadzenodo/<request_uuid>')
 def uploadresultszenodo(request_uuid):
+  if not session.has_key('user'):
+    return jsonify(error = 'not authorized')
   resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
   print 'setting celery app as current'
   celery_app.set_current()
