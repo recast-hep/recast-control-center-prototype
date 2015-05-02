@@ -9,7 +9,7 @@ import recastapi.request
 import recastapi.analysis 
 import pickle
 import pkg_resources
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, session
 
 from recastbackend.catalogue import getBackends
 from recastbackend.productionapp import app as celery_app
