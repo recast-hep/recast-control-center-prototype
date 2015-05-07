@@ -12,13 +12,10 @@ $(document).ready(function(){
     socket.on('room_msg', function (data) {
             console.log('got msg from room');
             console.log(data)
-            $('.logwindow').append('<span class="logdatetime">'+data['date']+'</span><span>'+data['msg']+'</span>\n')
-	    if(data['msg']=='done'){window.history.back();}
+            $('.logwindow').append('<div class="line"><span><code class="timestamp">'+data['date']+'</code></span><span><code class="message">'+data['msg']+'</code></span></div>')
         });
-
 });
 </script>
-
 {% endblock %}
 
 {% block container%}
@@ -30,7 +27,7 @@ $(document).ready(function(){
 <div class="row">
     <div class="col-md-14">
         <p>Messages from the request processor will appear below.</p>
-        <pre class="logwindow" style=""></pre>
+	<div class="logwindow"></div>
     </div>
 </div>
 {% endblock %}

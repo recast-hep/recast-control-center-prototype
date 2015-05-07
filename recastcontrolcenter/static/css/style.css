@@ -32,6 +32,34 @@
   display:block;
 }
 
+.logview{
+    background-color:#111;
+    color:#eee;
+    overflow:hidden;
+    width:100%;
+}
+.timestamp{
+    vertical-align:top;
+    display:inline-block;
+    background-color:#333;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    color:#f77;
+    width:175px;
+}
+.message{
+   vertical-align:top;
+   border:0;
+   background-color:#333;
+   color:#eee;
+   display:inline-block;
+   white-space: nowrap;
+   overflow:hidden;
+   text-overflow: ellipsis;
+   width: calc(100% - 175px);;
+}
+
 .logwindow{
   background-color:#333;
   color:#eee
