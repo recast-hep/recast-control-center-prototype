@@ -32,6 +32,10 @@
   display:block;
 }
 
+.line:hover{
+    background-color:#222;
+}
+
 .logview{
     background-color:#111;
     color:#eee;
@@ -41,23 +45,23 @@
 .timestamp{
     vertical-align:top;
     display:inline-block;
-    background-color:#333;
+    background-color:transparent;
     white-space: nowrap;
     overflow:hidden;
     text-overflow: ellipsis;
     color:#f77;
-    width:175px;
+    width:160px;
 }
 .message{
    vertical-align:top;
    border:0;
-   background-color:#333;
+   background-color:transparent;
    color:#eee;
    display:inline-block;
    white-space: nowrap;
    overflow:hidden;
    text-overflow: ellipsis;
-   width: calc(100% - 175px);;
+   width: calc(100% - 160px);;
 }
 
 .logwindow{
