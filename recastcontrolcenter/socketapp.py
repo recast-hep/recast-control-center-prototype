@@ -2,11 +2,15 @@
 import redis
 from socketio.mixins import RoomsMixin
 from socketio.namespace import BaseNamespace
-from recastbackend.productionapp import app as celery_app
 import recastbackend.messaging
 import msgpack
 import celery
 import json
+import os
+import importlib
+import recastconfig
+
+celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).app
 
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
   def subscriber(self):

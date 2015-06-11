@@ -7,5 +7,4 @@ SSO_ATTRIBUTE_MAP = {
   'HTTP_ADFS_LOGIN': (True, 'username'),
 }
 SSO_LOGIN_URL = '/login'
-RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'

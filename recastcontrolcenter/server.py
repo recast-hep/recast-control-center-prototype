@@ -11,12 +11,13 @@ import recastcontrolcenter.backendtasks as asynctasks
 from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for, abort
 from flask_sso import SSO
 from socketio import socketio_manage
-from socketio.server import serve
 from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
 from recastbackend.catalogue import all_backend_catalogue
-from recastbackend.productionapp import app as celery_app
 from recastdb.database import db
+import recastconfig
+
+celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).app
 
 
 
@@ -42,6 +43,7 @@ def create_app(config = None):
 
   return app
   
+print "creating app"
 flask_app = create_app()
 
 for backend,analysis_list in all_backend_catalogue.iteritems():
@@ -50,8 +52,6 @@ for backend,analysis_list in all_backend_catalogue.iteritems():
     flask_app.register_blueprint(blueprint, url_prefix='/'+analysis_uuid)
 
 sso_extension = SSO(app=flask_app)
-
-
 
 @sso_extension.login_handler
 def login(user_info):
@@ -68,14 +68,14 @@ def logout():
 #
 @flask_app.route("/")
 def home():
-    # if(session.has_key('user')): session.pop('user')
-    # session['user'] =  {'username':'lukas'}
+    if(session.has_key('user')): session.pop('user')
+    session['user'] =  {'username':'lukas'}
     userinfo = session.get('user',{})
     return render_template('home.html', userinfo = userinfo)
 
 @flask_app.route('/status/<requestId>')
 def request_overall_status(requestId):
-  resultdir = '{}/results/{}'.format(flask.current_app.config['RECASTSTORAGEPATH'],requestId)
+  resultdir = '{}/results/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],requestId)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
@@ -83,13 +83,13 @@ def request_overall_status(requestId):
 def request_point_status(requestId,parameter_pt):
   backend = request.args['backend']
   assert backend
-  resultdir = '{}/results/{}/{}/{}'.format(flask.current_app.config['RECASTSTORAGEPATH'],requestId,parameter_pt,backend)
+  resultdir = '{}/results/{}/{}/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],requestId,parameter_pt,backend)
   available = os.path.exists(resultdir)
   return jsonify(resultsAvailable=available)
 
 @flask_app.route('/resultfile/<requestId>/<parameter_pt>/<path:file>')
 def plots(requestId,parameter_pt,file):
-  filepath = '{}/results/{}/{}/{}'.format(flask.current_app.config['RECASTSTORAGEPATH'],requestId,parameter_pt,file)
+  filepath = '{}/results/{}/{}/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],requestId,parameter_pt,file)
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
 @flask_app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
@@ -232,6 +232,3 @@ zippedfile: {zippedfile}
 )
     celery_app.set_current()
     asynctasks.upload_in_background.delay(requestuuid,username,description,nevents,xsec,zipfilename)
-    
-def do_serve():
-  serve(flask_app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling')

@@ -30,7 +30,7 @@ setup(
   ],
   entry_points = {
     'console_scripts': [
-      'recast-control-center = recastcontrolcenter.server:do_serve',
+      'recast-control-center = recastcontrolcenter.servercli:servercli',
       'recast-admin = recastcontrolcenter.admin.recastadmin:recastadmin'
     ]
   },

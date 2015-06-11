@@ -9,15 +9,16 @@ import recastapi.request
 import recastapi.analysis 
 import pickle
 import pkg_resources
+import recastconfig
+import importlib
 from flask import Blueprint, render_template, jsonify, request, session
 
 from recastbackend.catalogue import getBackends
-from recastbackend.productionapp import app as celery_app
+celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).app
 celery_app.set_current()
 
 import recastbackend.jobstate
 
-RECASTSTORAGEPATH = '/home/analysis/recast/recaststorage'
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
 
 
@@ -154,7 +155,7 @@ def zipdir(path, zip):
 def uploadresults(request_uuid):
   if not session.has_key('user'):
     return jsonify(error = 'not authorized')
-  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
+  resultdir = '{}/results/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],request_uuid)
   response_file = '{}.zip'.format(resultdir)
   with zipfile.ZipFile(response_file,'w') as resultzip:
     zipdir(resultdir,resultzip)
@@ -176,19 +177,17 @@ def uploadresults(request_uuid):
   return jsonify(success = 'ok')
 
 import recastcontrolcenter.backendtasks as asynctasks
-from recastbackend.productionapp import app as celery_app
 
 
 @recast.route('/uploadzenodo/<request_uuid>')
 def uploadresultszenodo(request_uuid):
   if not session.has_key('user'):
     return jsonify(error = 'not authorized')
-  resultdir = '{}/results/{}'.format(RECASTSTORAGEPATH,request_uuid)
+  resultdir = '{}/results/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],request_uuid)
   print 'setting celery app as current'
   celery_app.set_current()
 
-  print 'uploading'
+  print 'uploading from rootdir: {}'.format(resultdir)
   asynctasks.uploadallzenodo.delay(resultdir,request_uuid)
-  print 'leaving'
   return jsonify(depositionid = 123)
 
