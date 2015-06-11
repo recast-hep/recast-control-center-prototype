@@ -1,5 +1,5 @@
-RECASTSTORAGEPATH: "~/recast/recaststorage"
-RECAST_CONTENT_PATH_TEMPL: "~/recast/recaststorage/results/{}/{}"
+RECASTSTORAGEPATH: "/home/analysis//recast/recaststorage"
+RECAST_CONTENT_PATH_TEMPL: "/home/analysis/recast/recaststorage/results/{}/{}"
 GITHUBSECRET: ''
 ZENODO_TOKEN: ''
 RECAST_CELERYAPP: 'recastbackend.productionapp'

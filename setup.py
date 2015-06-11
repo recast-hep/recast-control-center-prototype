@@ -23,6 +23,7 @@ setup(
     'recast-susyhiggs-demo',
     'recast-dmhiggs-demo',
     'recast-rivet-recaster-demo',
+    'recast-fullchain-demo',
     'Flask',
     'Flask-SSO',
     'Click',
@@ -44,6 +45,7 @@ setup(
     'https://github.com/recast-hep/recast-hype-demo/tarball/master#egg=recast-hype-demo-0.0.1',
     'https://github.com/recast-hep/recast-susyhiggs-demo/tarball/master#egg=recast-susyhiggs-demo-0.0.1',
     'https://github.com/recast-hep/recast-dmhiggs-demo/tarball/master#egg=recast-dmhiggs-demo-0.0.1',
+    'https://github.com/recast-hep/recast-fullchain-demo/tarball/master#egg=recast-fullchain-demo-0.0.1',
     'https://github.com/recast-hep/recast-rivet-recaster-demo/tarball/master#egg=recast-rivet-recaster-demo-0.0.1'
   ]
 )

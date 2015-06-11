@@ -77,6 +77,7 @@ def home():
 def request_overall_status(requestId):
   resultdir = '{}/results/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],requestId)
   available = os.path.exists(resultdir)
+  print available
   return jsonify(resultsAvailable=available)
 
 @flask_app.route('/status/<requestId>/<parameter_pt>')
@@ -90,6 +91,7 @@ def request_point_status(requestId,parameter_pt):
 @flask_app.route('/resultfile/<requestId>/<parameter_pt>/<path:file>')
 def plots(requestId,parameter_pt,file):
   filepath = '{}/results/{}/{}/{}'.format(recastconfig.config['RECASTSTORAGEPATH'],requestId,parameter_pt,file)
+  print filepath
   return send_from_directory(os.path.dirname(filepath),os.path.basename(filepath))
 
 @flask_app.route('/resultview/<requestId>/<parameter_pt>/<backend>')
