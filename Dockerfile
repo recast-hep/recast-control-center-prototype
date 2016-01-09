@@ -35,4 +35,3 @@ RUN adduser --uid 1000 --disabled-password --gecos '' recast && \
 
 # Start the application:
 USER recast
-CMD ["recast-control-center"]

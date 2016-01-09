@@ -37,7 +37,7 @@ setup(
     'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-emitter-0.1.3',
     'https://github.com/recast-hep/recast-api/tarball/master#egg=recast-api-0.0.1',
     'https://github.com/recast-hep/recast-database/tarball/master#egg=recast-database-0.0.1',
-    'https://github.com/recast-hep/recast-database/tarball/master#egg=recast-resultblueprints-0.0.1',
+    'https://github.com/recast-hep/recast-resultblueprints/tarball/master#egg=recast-resultblueprints-0.0.1',
     'https://github.com/recast-hep/recast-backend/tarball/master#egg=recast-backend-0.0.1',
   ]
 )
