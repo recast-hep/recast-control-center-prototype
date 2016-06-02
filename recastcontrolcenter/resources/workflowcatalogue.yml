@@ -1,0 +1,27 @@
+- analysis_id: 'b92bc3d1-cf6f-402f-9ae1-bf210842983c'
+  backend_workflows:
+    - name: 'original'
+      toplevel: 'from-github/pseudocap'
+      workflow: 'pseudocap/ewk_analyses/ewkdilepton_analysis/ewk_dilepton_recast_workflow_sta.yml'
+      additional_parameters: []
+      additional_outputs:
+        - 'out.yield'
+        - 'out.root'
+        - 'fit.tgz'
+        - 'results.yaml'
+- analysis_id: '3cd5259a-6473-4616-9b86-23e609ce0f95'
+  backend_workflows:
+    - name: 'delphes'
+      toplevel: 'from-github/phenochain'
+      workflow: 'madgraph_delphes.yml'
+      additional_parameters: []
+      additional_outputs:
+        - output.root
+        - output.lhco
+    - name: 'rivet'
+      toplevel: 'from-github/phenochain'
+      workflow: 'madgraph_rivet.yml'
+      additional_parameters:
+        rivet_analysis: MC_GENERIC
+      additional_outputs:
+        - Rivet.yoda

@@ -33,9 +33,9 @@
             </tr>
         </thead>
         <tbody>
-            {% for row in requests_info %}
+            {% for row in requests_info['_items'] %}
                 <tr>
-                    <td>{{row['requestor']}}</td>
+                    <td>{{row['requester_id']}}</td>
                     <td><a href="/recast/request/{{row['uuid']}}">{{row['title']}}</a></td>
                 </tr>
             {% endfor %}

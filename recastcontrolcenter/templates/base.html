@@ -102,7 +102,6 @@ UserVoice.push(['autoprompt', {}]);
     <body>
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.17/socket.io.js"></script>
 
-
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <!-- Include all compiled plugins (below), or include individual files as needed -->
         <script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
@@ -120,21 +119,13 @@ UserVoice.push(['autoprompt', {}]);
                        <span class="icon-bar"></span>
                        <span class="icon-bar"></span>
                      </button>
-                     <a class="navbar-brand" href="{{url_for('home')}}">Recast</a>
+                     <a class="navbar-brand" href="{{url_for('home')}}">Recast Control Center</a>
                </div>
 
-        
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <!-- <form class="navbar-form navbar-left" role="search">
-                        <select  name="analysis-uuid" class="form-control" id="version-selector">
-                            <option value="RECAST">RECAST</option>
-                            <option value="RIVET">RIVET</option>
-                        </select>
-                    </form> -->
-    
                     <ul class="nav navbar-nav">
-                        <li id="nav-allreq"><a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a></li>
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
+                        <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">Dashboard</a></li>
                     </ul>
                 
                     <ul class="nav navbar-nav navbar-right">

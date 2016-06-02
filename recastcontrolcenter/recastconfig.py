@@ -5,7 +5,6 @@ import yaml
 def default_config():
   return yaml.load(open(pkg_resources.resource_filename('recastcontrolcenter','resources/config.yaml')))
 
-
 def mk_config():
   the_config = default_config()
   if os.environ.has_key('RECASTCONTROLCENTER_CONFIG'):

@@ -10,16 +10,15 @@ setup(
   author_email = 'lukas.heinrich@cern.ch',
   packages=find_packages(),
   install_requires = [
-    'celery',
+    'celery==3.1.20',
     'redis',
-    'gevent',
+    'gevent==1.1b4',
     'gevent-socketio',
     'msgpack-python',
     'socket.io-emitter',
     'recast-api',
     'recast-backend',
     'recast-resultblueprints',
-    'recast-database',
     'Flask',
     'Flask-SSO',
     'Click',
@@ -36,7 +35,6 @@ setup(
   dependency_links = [
     'https://github.com/ziyasal/socket.io-python-emitter/tarball/master#egg=socket.io-emitter-0.1.3',
     'https://github.com/recast-hep/recast-api/tarball/master#egg=recast-api-0.0.1',
-    'https://github.com/recast-hep/recast-database/tarball/master#egg=recast-database-0.0.1',
     'https://github.com/recast-hep/recast-resultblueprints/tarball/master#egg=recast-resultblueprints-0.0.1',
     'https://github.com/recast-hep/recast-backend/tarball/master#egg=recast-backend-0.0.1',
   ]

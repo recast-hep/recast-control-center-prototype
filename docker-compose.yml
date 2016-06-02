@@ -1,13 +1,23 @@
 web:
   build: .
-  command: recast-control-center
+  command: recast-control-center server -c myconfig.yml
   ports:
    - "8000:8000"
   environment:
    - REDIS_HOST=redis
-  volumes:
-   - .:/code
+  #volumes:
+  # - .:/code
   links:
    - redis
 redis:
   image: redis
+worker:
+  build: .
+  command: recast-control-center celery -c myconfig.yml
+  links:
+    - redis
+  environment:
+    - CELERY_REDIS_HOST=redis
+    - CELERY_REDIS_PORT=6379
+    - CELERY_REDIS_DB=1
+    - C_FORCE_ROOT=true

@@ -1,161 +1,10 @@
 {% extends "base.html" %}
         
-{% block prebody %}
-<script type="text/javascript">
-$(document).ready(function(){
-    $('#add-parameter-point-btn').click(function(){
-        $('#themodal').modal()
-    })
-    $('#request-id-modal').hide()
-    $('#drophtml').hide()
-
-    $('#upload-response-btn').click(function(){
-        url = location.origin+'/recast/updateResponse/{{request_info['uuid']}}'
-        $.ajax(url,{
-            async: false,
-            complete: function(data){
-               $('#upload-modal').modal()
-            }
-        })
-
-    })
-
-
-    $('#upload-zenodo-response-btn').click(function(){
-       $('#upload-zenodo-modal').modal()
-    })
-
-    $('#trigger-zenodo-upload-btn').click(function(){
-        url = location.origin+'/recast/uploadzenodo/{{request_info['uuid']}}'
-        $.ajax(url,{async: false,
-        complete: function(data){console.log(data['responseJSON'])}})
-    })
-    
-    {% if not session.has_key('user') %}
-       $('#add-parameter-point-btn').addClass('disabled')
-       $('#upload-response-btn').addClass('disabled')
-       $('#upload-zenodo-response-btn').addClass('disabled')
-    {% endif  %}
-
-    var requestResultsAvailable = false
-    $.ajax(location.origin+'/status/{{request_info['uuid']}}',{
-        async: false,
-        complete: function(data){
-            requestResultsAvailable = data['responseJSON']['resultsAvailable']
-            if(!requestResultsAvailable){
-                $('#upload-response-btn').addClass('disabled')
-                // $('#upload-zenodo-response-btn').addClass('disabled')
-            }                    
-        }
-    })
-
-    $('.process-btn').click(function(){
-        parameter_pt = $(this).attr('data-parameter-pt')
-        backend = $(this).attr('data-backend')
-        url = location.origin+'/recast/processRequestPoint/{{request_info['uuid']}}/'+parameter_pt+'?'+'backend='+backend
-        console.log('processing requested using backend: '+backend)
-
-        $.ajax(url,{
-            complete: function(data){
-                var jobguid = data['responseJSON']['jobguid']
-                console.log(data['responseJSON'])
-
-                console.log('got jobguid: '+jobguid)
-                console.log('task ids of chain are: '+jobguid)
-                window.location.assign(location.origin+'/monitor/' + jobguid)
-            }
-        })
-    
-    })
-
-
-    $('.result-btn').each(function(){
-        var button = $(this)
-        backend = button.attr('data-backend')
-        var requestId = $(this).attr('data-parameter-pt')
-        var resultsAvailable = false
-        $.ajax(location.origin+'/status/{{request_info['uuid']}}/'+requestId+'?backend='+backend,{
-            async: false,
-            complete: function(data){
-                resultsAvailable = data['responseJSON']['resultsAvailable']
-                if(!resultsAvailable){
-                    button.parent().addClass('disabled')
-                }                    
-            }
-        })
-    })
-    
-    $('.results-group').each(function(){
-        if(!$(this).children().filter('ul').children().filter(function(){return !$(this).hasClass('disabled')}).length){
-            $(this).children().filter('button').addClass('disabled')
-        }
-    })
-
-    {% if not session.has_key('user') %}
-       $('.process-group button').addClass('disabled')
-    {% endif %}
-
-
-});
-</script>
-
-  
-<div id="drophtml">
-    <div class="dz-preview dz-file-preview">
-
-        <div class="dz-progress progress">
-            <div style="position:relative">
-            <div class="dz-upload progress-bar" data-dz-uploadprogress style="position:absolute;height:25px">
-            </div>
-            <div class="dz-details" style="position:absolute;">
-                <span class="dz-success-mark"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>
-                <span class="dz-error-mark"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>
-                <span class="dz-size" data-dz-size></span>
-                <span class="dz-filename"><span data-dz-name style="display:inline-block;width:50%;white-space: nowrap;text-overflow:ellipsis;overflow:hidden;"></span></span>
-            </div>                
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<script type="text/javascript">
-
-var uploadguid = undefined;
-
-Dropzone.options.dropzone = {
-
-    // Prevents Dropzone from uploading dropped files immediately
-    autoProcessQueue: false,
-    previewTemplate: $("#drophtml").html(),
-    dictDefaultMessage: '',  
-    uploadMultiple: true,
-    parallelUploads: 100,
-    init: function() {
-        var submitButton = document.querySelector("#create-point-btn")
-        myDropzone = this; // closure
-        submitButton.addEventListener("click", function() {
-            myDropzone.processQueue(); // Tell Dropzone to process all queued files.
-        });
-        
-        myDropzone.on('successmultiple',function(files,response){
-            console.log(files)
-            console.log(response)
-            $('#themodal').modal('hide')
-            location.reload();
-        });
-    }
-};
-</script>
-
-{% endblock %}
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast Request <small>{{request_info['title']}}</small></h1>
-</div>    
+    <h1>Recast Scan Request <small>{{request_info['title']}}</small></h1>
 
-<div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
         
@@ -167,26 +16,22 @@ Dropzone.options.dropzone = {
                             <dt>analysis</dt>
                             <dd><a href="/recast/analysis/{{analysis_info['uuid']}}">{{analysis_info['title']}}</a></dd>
                     {% for key,value in request_info.iteritems() %}
-                        {% if key not in ['parameter-points','analysis-uuid'] %}
+                        {% if key not in ['parameter-points','analysis-uuid','_links','_id','_updated','_created','_id','_links'] %}
                             <dt>{{key}}</dt>
                             <dd>{{value}}</dd>
                         {% endif %}
                     {% endfor %}
                 </dl>        
             </div>
-
+            
             <div class="panel-footer"></div>
         </div>
     </div> <!-- col -->
-</div> <!-- row -->
+</div>    
+
 <div class="row">
     <div class="col-md-12">
         <span>
-            <p>
-            <button id="add-parameter-point-btn"type="button" class="btn btn-default" aria-label="Left Align">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span>Add Parameter Point</span>
-            </button>    
-            
             <button id="upload-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
               <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span>Upload to RECAST</span>
             </button>    
@@ -199,185 +44,85 @@ Dropzone.options.dropzone = {
     </div> <!-- col -->
 </div> <!-- row -->
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default">
-
-
-    {% if request_info['parameter-points']%}
-
-    <table id="whatwhat" class="table table-hover">
-        <thead>
-            <tr>
-                <span class="col-md-2" style="display:inline-block  ">Parameter</span>
-                <span class="col-md-2" style="display:inline-block  ">Desciption</span>
-                <span class="col-md-2" style="display:inline-block  ">Number of Events</span>
-                <span class="col-md-2" style="display:inline-block  ">Cross-Section</span>
-                <span class="col-md-3" style="display:inline-block  ">Actions</span>
-            </tr>
-        </thead>
-
-        {% for row,row_info in request_info['parameter-points'].iteritems() %}
-
-        {% set joblist = status_info[row] %}
-
-        <tr>
-            <td class="col-md-11">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordion_{{loop.index}}">
-                    <span style="display:inline-block" class="col-md-2">{{row}}</span>
-                </a>
-                <span style="display:inline-block" class="col-md-2">{{row_info['point-name']}}</span>
-                <span style="display:inline-block" class="col-md-2">{{row_info['run-condition'][0]['number-of-events']}}</span>
-                <span style="display:inline-block" class="col-md-2">{{row_info['run-condition'][0]['reference-x-section']}}</span>
-                <span style="display:inline-block" class="col-md-3">
-                    
-                    <!-- Single button -->
-                    <div class="btn-group process-group">
-                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        Process <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                      {% for b in backends %}
-                        <li><a href="#" class="process-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
-                      {% endfor %}
-                      </ul>
-                    </div>
-                    <!-- Single button -->
-                    <div class="btn-group results-group">
-                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        Results <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                      {% for b in backends %}
-                        <li><a href="/resultview/{{request_info['uuid']}}/{{row}}/{{b}}" class="result-btn" data-parameter-pt="{{row}}" data-backend="{{b}}">{{b}}</a></li>
-                      {% endfor %}
-                      </ul>
-                    </div>
-                </span>
-
-                <div id="accordion_{{loop.index}}" class="detail_point_info collapse">
-                    <div class="col-md-10">
-                        <div class="col-md-10">
-                        <p>processings of this parameter point</p>
-                        <table class="table table-bordered table-condensed col-md-10">
-                        <thead>
-                            <tr>
-                                <th class="col-md-6">job ID</th>
-                                <th class="col-md-2">backend</th>
-                                <th class="col-md-2">state</th>
-                            </tr>
-                        </thead>
-                        {% for jobinfo in joblist %}
-                          <tr>
-                              <td class="col-md-6"><a href="/monitor/{{jobinfo['job']}}">{{jobinfo['job']}}</a></td>
-                              <td class="col-md-2">{{jobinfo['backend']}}</td>
-				{% if jobinfo['celery'] == 'SUCCESS' %}
-                                <td class="col-md-2 bg-success">{{jobinfo['celery']}}</td>
-				{% elif  jobinfo['celery'] == 'FAILURE' %} 
-                                <td class="col-md-2 bg-danger">{{jobinfo['celery']}}</td>
-				{% elif  jobinfo['celery'] == 'PENDING' %} 
-                                <td class="col-md-2 bg-info">{{jobinfo['celery']}}</td>
-                                {% else %}
-                                <td class="col-md-2">{{jobinfo['celery']}}</td>
-                                {% endif %}
-                        </tr>
+<div class="col-md-12">
+    {% for point,basic_requests in points_and_requests %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Point Request #{{loop.index}} {{point['uuid']}}</div>
+        <div class="panel-body">
+            <h6>Request Details</h6>
+            <dl class="dl-horizontal">
+                {% for key,value in point.iteritems() %}
+                    {% if key not in ['_updated','_created','_id','_links','uuid'] %}
+                        <dt>{{key}}</dt>
+                        <dd>{{value}}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>        
+            <hr>
+            <h6>Basic Requests</h6>
+            {% for basic_request in basic_requests %}
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        {% for key,value in basic_request.iteritems() %}
+                            {% if key not in ['_updated','_created','_id','_links'] %}
+                                <dt>{{key}}</dt>
+                                <dd>{{value}}</dd>
+                            {% endif %}
                         {% endfor %}
-                        </table>
+                    </dl>        
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <h6>Actions:</h6>
+                        <!-- Single button -->
+                        <div class="btn-group process-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Process <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu" role="menu">
+                          {% for b in ['dummy'] %}
+                            <li><a href="#" class="process-btn" data-parameter-pt="" data-backend="">{{b}}</a></li>
+                          {% endfor %}
+                          </ul>
                         </div>
-                
+                        <!-- Single button -->
+                        <div class="btn-group results-group">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Results <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu" role="menu">
+                          {% for b in ['dummy'] %}
+                            <li><a href="/resultview/dummyendpoing" class="result-btn" data-parameter-pt="" data-backend="">{{b}}</a></li>
+                          {% endfor %}
+                          </ul>
+                        </div>
                     </div>
-                </div> 
-            </td>
-        </tr>
-      {% endfor %}
-      </table>
-    {% endif %}
-    
-        </div> <!-- panel -->
-    </div> <!-- col -->
+                    <div class="row">
+                        <h6>Past Processing Jobs</h6>
+                        {% set joblist = [1,2,3] %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>processing id</td>
+                                    <td>status</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for jobinfo in joblist %}
+                               <tr>
+                                   <td>b</td>
+                                   <td>c</td>
+                               </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+    {% endfor %} <!-- end of point request loop -->
 </div> <!-- row -->
-
-
-
-
-
-
-<div id="themodal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-    <div class="modal-body" style="overflow-y: auto;">
-        <form action="/recast/upload" method=post enctype=multipart/form-data class="dropzone" id="dropzone">
-          <input value="{{request_info['uuid']}}" name="request_uuid" type="text" class="form-control" id="request-id-modal" placeholder="Request Id">
-
-          <div class="form-group">
-            <label for="title">User</label>
-            <input value="lheinric" name="username" type="text" class="form-control" id="user-name" placeholder="username">
-          </div>
-
-          <div class="form-group">
-            <label for="title">Point Description</label>
-            <input value="" name="description" type="text" class="form-control" id="description" placeholder="description">
-          </div>
-
-          <div class="form-group">
-            <label for="title">Number of Events</label>
-            <input value="1000" name="nevents" type="text" class="form-control" id="nevents" placeholder="number of events">
-          </div>
-
-          <div class="form-group">
-            <label for="title">Cross Section (fb)</label>
-            <input value="20" name="xsec" type="text" class="form-control" id="xsec" placeholder="cross section (fb)">
-          </div>
-
-          <p>Click to add files or drop on this area</p>            
-          <div class="fallback" style="overflow-y: auto;">
-              <input name="file" type="file" multiple />
-              <input type="submit">submit</input>
-          </div>
-          </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="create-point-btn">Create Parameter Point</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div id="upload-modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-           <h4 class="modal-title">Success</h4>
-      </div>
-      <div class="modal-body">
-          Uploaded latest result file to RECAST server.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div id="upload-zenodo-modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-           <h4 class="modal-title">Success</h4>
-      </div>
-      <div class="modal-body">
-          Once results are uploaded to Zenodo, no more data points can be added.
-      </div>
-      <div class="modal-footer">
-        <button id='trigger-zenodo-upload-btn'type="button" class="btn btn-primary" data-dismiss="modal">Upload</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-
-
-
 
 {% endblock %}
