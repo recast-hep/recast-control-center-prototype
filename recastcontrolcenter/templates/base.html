@@ -7,62 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RECAST - An Analysis Reinterpretation Framework</title>
 
-<script>
-// Include the UserVoice JavaScript SDK (only needed once on a page)
-UserVoice=window.UserVoice||[];(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/MgKxolX9SRdXOcQJjYfvrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})();
-
-//
-// UserVoice Javascript SDK developer documentation:
-// https://www.uservoice.com/o/javascript-sdk
-//
-
-// Set colors
-UserVoice.push(['set', {
-  accent_color: '#808283',
-  trigger_color: 'white',
-  trigger_background_color: 'rgba(46, 49, 51, 0.6)'
-}]);
-
-// Identify the user and pass traits
-// To enable, replace sample data with actual user traits and uncomment the line
-UserVoice.push(['identify', {
-  //email:      'john.doe@example.com', // User’s email address
-  //name:       'John Doe', // User’s real name
-  //created_at: 1364406966, // Unix timestamp for the date the user signed up
-  //id:         123, // Optional: Unique id of the user (if set, this should not change)
-  //type:       'Owner', // Optional: segment your users by type
-  //account: {
-  //  id:           123, // Optional: associate multiple users with a single account
-  //  name:         'Acme, Co.', // Account name
-  //  created_at:   1364406966, // Unix timestamp for the date the account was created
-  //  monthly_rate: 9.99, // Decimal; monthly rate of the account
-  //  ltv:          1495.00, // Decimal; lifetime value of the account
-  //  plan:         'Enhanced' // Plan name for the account
-  //}
-}]);
-
-// Add default trigger to the bottom-right corner of the window:
-UserVoice.push(['addTrigger', { mode: 'smartvote', trigger_position: 'bottom-right' }]);
-
-// Or, use your own custom trigger:
-//UserVoice.push(['addTrigger', '#id', { mode: 'smartvote' }]);
-
-// Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
-UserVoice.push(['autoprompt', {}]);
-</script>
-
-    <!-- Google Analytics -->
-    <script>
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	ga('create', 'UA-59451157-1', 'auto');
-  	ga('send', 'pageview');
-    </script>
-
-
     <!-- Bootstrap -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
@@ -112,7 +56,7 @@ UserVoice.push(['autoprompt', {}]);
         </style>
         <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
             <div class="container-fluid">
-        
+
                 <div class="navbar-header">
                      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                        <span class="sr-only">Toggle navigation</span>
@@ -120,10 +64,10 @@ UserVoice.push(['autoprompt', {}]);
                        <span class="icon-bar"></span>
                        <span class="icon-bar"></span>
                      </button>
-                     <a class="navbar-brand" href="{{url_for('home')}}">Recast</a>
+                     <a class="navbar-brand" href="{{url_for('home')}}">RECAST Control Center</a>
                </div>
 
-        
+
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <!-- <form class="navbar-form navbar-left" role="search">
                         <select  name="analysis-uuid" class="form-control" id="version-selector">
@@ -131,12 +75,11 @@ UserVoice.push(['autoprompt', {}]);
                             <option value="RIVET">RIVET</option>
                         </select>
                     </form> -->
-    
+
                     <ul class="nav navbar-nav">
-                        <li id="nav-allreq"><a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a></li>
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
                     </ul>
-                
+
                     <ul class="nav navbar-nav navbar-right">
                     {% if session.has_key('user') %}
                         <li id="nav-allreq"><a href="/logout">Logged in as {{session['user']['username']}}. Logout</a></li>
@@ -148,8 +91,8 @@ UserVoice.push(['autoprompt', {}]);
                 </div>
             </div>
         </nav>
-        
-        
+
+
         <script type="text/javascript">
 
         // $(document).ready(function(){
@@ -166,8 +109,8 @@ UserVoice.push(['autoprompt', {}]);
         // });
 
         </script>
-        
-        
+
+
         {% block prebody %}
         {% endblock %}
 
@@ -175,10 +118,10 @@ UserVoice.push(['autoprompt', {}]);
             {% block container %}
             <div id="row" style="background-color:red;">
                 hello
-            </div>            
+            </div>
             {% endblock %}
         </div>
 
-    
+
     </body>
     </html>

@@ -1,11 +1,15 @@
 {% extends "base.html" %}
-        
+
 {% block prebody %}
 <script type="text/javascript">
 $(document).ready(function(){
 
     var socket = io.connect(location.origin+'/monitor');
     socket.emit('helloServer')
+    socket.on('plainEmit',function(data){
+      console.log('got stuff from socket')
+      console.log(data)
+    })
 
 });
 </script>
@@ -15,14 +19,14 @@ $(document).ready(function(){
 {% block container%}
 <div class="page-header">
     <h1>Recast Control Center <small>An Analysis Reinterpretation Framework</small></h1>
-</div>    
+</div>
 
 
 <div class="row">
     <div class="col-md-9">
         <h2>Introduction</h2>
         <p>
-            This is an early prototype for the RECAST control center. While the RECAST front-end at  <a href="http://recast.perimeterinstitute.ca">http://recast.perimeterinstitute.ca</a> is used to gather requests for analysis reinterpretation from the community, this web application is used to launch jobs for different back-ends that actually perform the reinterpretation.
+            This is an early prototype for the RECAST control center. It allows persons associated to a particular HEP experiment to fulfill reqeusts for reintrepretation of previously published analyses.
         </p>
         <p>It supports CERN SSO authentication which will allow for fine-grained control over which users are able to launch the reinterpretation jobs and/or upload the results to the front-end. This web application provides a plugin model for analyses. Currently, we have a template plugin for Rivet analyses that runs quickly. We are working with CERN IT's analysis preservation product to provide a template plugin for reinterpretation based on the full simulation, reconstruction, and event selection.
         </p>
@@ -31,7 +35,7 @@ $(document).ready(function(){
         <h2>Instructions</h2>
         <p>
             <ol>
-            <li>To test the RECAST service, click on the <a href="{{url_for('recast.recast_analyses_view')}}">All Analyses</a> link in the navigation above. Select the analyses that you want to recast. Alternatively you can also create a request on the <a href="http://recast.perimeterinstitute.ca/dev">RECAST front-end</a> (currently the development instance)</li>
+            <li>Alternatively you can also create a request on the <a href="http://recast.perimeterinstitute.ca/dev">RECAST front-end</a> (currently the development instance)</li>
             <li>Once you have chosen the analysis you want to recast, create a new request by clicking the <strong>New RECAST Request</strong> button and fill out the form. After you created the request you can click through to the page describing your new request</li>
             <li>On the request page you can now upload simulated events for specific parameter points in the Les Houches format. To do that click the <strong>Add Parameter Point</strong> button, describe the parameter point and select the necessary event files (you don't need to worry about the cross-section and number of events for now. Dummy values are OK.)</li>
             <li>Now that you have created a parameter point, you can process the request by hitting the <strong>Process</strong> button. Once the results become available you can view the results for the parameter point (you will need to reload the page at the moment).

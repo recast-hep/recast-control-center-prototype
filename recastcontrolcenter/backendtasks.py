@@ -22,17 +22,17 @@ def upload_in_background(requestuuid,username,description,nevents,xsec,zipfilena
   except:
     print "Unexpected error:", sys.exc_info()[0]
     raise
-  print "upload status: {}".format(r.ok)  
+  print "upload status: {}".format(r.ok)
 
 import recastconfig
-ACCESS_TOKEN = recastconfig.config['ZENODO_TOKEN'] 
+ACCESS_TOKEN = recastconfig.config['RECAST_ZENODO_TOKEN']
 
 def createdeposition(requestuuid,**kwargs):
   log.info('hello')
 
 
   url = "http://sandbox.zenodo.org/api/deposit/depositions/?access_token={}".format(ACCESS_TOKEN)
-  
+
   headers = {"Content-Type": "application/json"}
   data = {"metadata":
     {
@@ -52,7 +52,7 @@ def createdeposition(requestuuid,**kwargs):
   log.info('deposition id is: {}'.format(deposition_id))
   return deposition_id
 
-  
+
 def upload(deposition_id,filename,file):
   url = "http://sandbox.zenodo.org/api/deposit/depositions/{}/files?access_token={}".format(deposition_id,ACCESS_TOKEN)
   data = {'filename': filename}
@@ -69,7 +69,7 @@ def publish(deposition_id):
   log.info('response: {} {}'.format(r.status_code,r.reason))
   log.info('content:{}'.format(r.content))
   assert r.ok
-  
+
 def uploadzenodo_request(requestuuid):
   request_info = recastapi.request.request(requestuuid)
 
@@ -80,21 +80,20 @@ def uploadzenodo_request(requestuuid):
     arxiv_id =  match.group(1)
     supplement_to += [{"relation":"isSupplementTo","identifier":arxiv_id}]
 
-
   #upload request
   depoid = createdeposition(requestuuid,
     title = "RECAST request {}".format(requestuuid),
     description ="RECAST request {}".format(requestuuid),
     related_identifiers = supplement_to
   )
-  
+
   request_info_stream = StringIO.StringIO(yaml.safe_dump(request_info, encoding='utf-8'))
   upload(depoid,'requestinfo.yaml',request_info_stream)
   publish(depoid)
 
 def uploadzenodo_response(rootdir,requestuuid):
   request_info = recastapi.request.request(requestuuid)
-  
+
   #the response should be a supplement to the original analysis by the experiment that's being recast
   analysis_info = recastapi.analysis.analysis(request_info['analysis-uuid'])
   supplement_to = []
@@ -114,7 +113,7 @@ def uploadzenodo_response(rootdir,requestuuid):
     upload(depoid,truncated,open(file,'rb'))
 
   publish(depoid)
-  
+
 @shared_task
 def uploadallzenodo(rootdir,requestuuid):
   uploadzenodo_request(requestuuid)

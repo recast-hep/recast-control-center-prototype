@@ -4,6 +4,10 @@ import os
 import yaml
 import pkg_resources
 import subprocess
+import logging
+
+logging.basicConfig(level = logging.INFO)
+
 @click.group()
 def servercli():
   pass

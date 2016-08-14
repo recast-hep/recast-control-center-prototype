@@ -1,5 +1,5 @@
-RECASTSTORAGEPATH: "/home/analysis//recast/recaststorage"
-RECAST_CONTENT_PATH_TEMPL: "/home/analysis/recast/recaststorage/results/{}/{}"
-GITHUBSECRET: ''
-ZENODO_TOKEN: ''
-RECAST_CELERYAPP: 'recastbackend.productionapp'
+RECAST_STORAGEPATH: "/recastdata"
+RECAST_RESULT_BASE: "/home/analysis/recast/recaststorage/results"
+RECAST_CELERYAPP: 'recastbackend.fromenvapp'
+RECAST_GITHUBSECRET: ''
+RECAST_ZENODO_TOKEN: ''

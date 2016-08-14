@@ -15,7 +15,9 @@ celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).a
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
   def subscriber(self):
     print "subscribing to redis socket.io#emitter"
-    red = redis.StrictRedis(host = 'localhost', db = 0)
+    red = redis.StrictRedis(host = os.environ['CELERY_REDIS_HOST'],
+                            db = os.environ['CELERY_REDIS_DB'],
+                            port = os.environ['CELERY_REDIS_PORT'])
     pubsub = red.pubsub()
     pubsub.subscribe('socket.io#emitter')
     self.emit('subscribed')
@@ -27,7 +29,7 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     celery_app.set_current()
 
     assert celery.current_app == celery_app
-    
+
     print "getting stored messages for room {}".format(self.jobguid)
     stored = recastbackend.messaging.get_stored_messages(self.jobguid)
 
@@ -39,7 +41,7 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
 
       for_emit = ['room_msg', old_msg_data]
       self.emit(*for_emit)
-                    
+
     for m in pubsub.listen():
       # print m
       if m['type'] == 'message':
@@ -63,15 +65,15 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
                 self.emit(*data['data'])
           else:
               self.emit(*data['data'])
-    
+
   def on_helloServer(self):
     print "hello back"
-    self.emit('plainEmit')
+    self.emit('plainEmit',{'some':'data'})
     print "emitting to room"
 
   def on_subscribe(self):
     print "not doing much on subscribe"
-    
+
   def on_join_recast_jobguid(self,data):
     print "joining room: {}".format(data['room'])
 
@@ -86,5 +88,5 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
 
   def on_emitToRoom(self,data):
     print "emitting to room: {} and myself".format(data['room'])
-    self.emit('room_msg',data['msg']) 
+    self.emit('room_msg',data['msg'])
     self.emit_to_room(data['room'],'room_msg',data['msg'])

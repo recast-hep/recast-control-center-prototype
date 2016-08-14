@@ -3,7 +3,7 @@
 {% block postheader %}
 
 {% endblock %}
-        
+
 {% block prebody %}
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css">
     <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
@@ -20,7 +20,7 @@
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast Requests</h1>
+    <h1>Recast Scan Requests</h1>
 </div>
 
 <div class="row">
@@ -28,16 +28,14 @@
     <table id="requestsTable" class="table table-striped">
         <thead>
             <tr>
-                <th>Requestor</th>
                 <th>Title</th>
             </tr>
         </thead>
         <tbody>
             {% for row in requests_info %}
-                <tr>
-                    <td>{{row['requestor']}}</td>
-                    <td><a href="/recast/request/{{row['uuid']}}">{{row['title']}}</a></td>
-                </tr>
+              <tr>
+                <td><a href=/recast/request/{{row['id']}}>{{row['title']}}</a></td>
+              </tr>
             {% endfor %}
         </tbody>
     </table>

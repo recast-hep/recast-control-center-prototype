@@ -8,7 +8,7 @@ FROM python:2.7.7
 RUN pip install PyColorizer \
                 PyYaml \
                 argcomplete \
-                celery \
+                celery==3.1.20 \
                 flask-sso \
                 gevent \
                 gevent_socketio \
