@@ -108,49 +108,48 @@ $(document).ready(function(){
 </div> <!-- row -->
 
 <div class="row">
-
-{% for i,pp in parpoints %}
-  <div>
-    parameter point {{i}}
-    basic:<br>
-    <div>
-      {% for br in basic_req_data[pp['id']] %}
-        <div>
-          basic request: {{br['_updated']}}
-
-          <!-- Single button -->
-          <div class="btn-group process-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              Process <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-            {% for b in ['capbackend'] %}
-              <li><a href="#" class="btn process-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
-            {% endfor %}
-            </ul>
-          </div>
-          <!-- Single button -->
-          <div class="btn-group results-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              Results <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-            {% for b in ['capbackend'] %}
-              <li><a href="/resultview/{{br['id']}}/{{b}}" class="btn result-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
-            {% endfor %}
-            </ul>
-          </div>
-
-
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-
-
-  <!-- {{pp['id']}} -->
-{% endfor %}
-</div>
+  <ul class="list-group">
+  {% for i,pp in parpoints %}
+      <li class="list-group-item">
+        <h6>Parameter Point {{pp['id']}}</h6>
+        {% if basic_req_data[pp['id']] %}
+        <p>Basic Requests:</p>
+        <ul class="list-group">
+          {% for br in basic_req_data[pp['id']] %}
+            <li class="list-group-item">
+                <span>Basic Request: {{br['id']}}.</span>
+                <!-- The UI buttons -->
+                <span>
+                <!-- Single button -->
+                <div class="btn-group process-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Process <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                  {% for b in ['capbackend'] %}
+                    <li><a href="#" class="btn process-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                  {% endfor %}
+                  </ul>
+                </div>
+                <!-- Single button -->
+                <div class="btn-group results-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Results <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                  {% for b in ['capbackend'] %}
+                    <li><a href="/resultview/{{br['id']}}/{{b}}" class="btn result-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                  {% endfor %}
+                  </ul>
+                </div>
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+  {% endfor %}
+</ul>
 
 <div id="upload-modal" class="modal fade">
   <div class="modal-dialog">

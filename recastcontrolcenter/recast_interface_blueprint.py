@@ -24,7 +24,7 @@ recast = Blueprint('recast', __name__, template_folder='recast_interface_templat
 def recast_request_view(reqid):
   request_info = recastapi.request.get.request(reqid)
 
-  analysis_id = recastapi.request.get.request(9)['analysis_id']
+  analysis_id = recastapi.request.get.request(reqid)['analysis_id']
   analysis_info = recastapi.analysis.get.analysis(analysis_id)
 
   parpoints = recastapi.request.get.point_requests_for_scan(reqid)['_items']

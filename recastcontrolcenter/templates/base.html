@@ -50,7 +50,6 @@
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <!-- Include all compiled plugins (below), or include individual files as needed -->
         <script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
-        <script src="{{ url_for('static',filename='js/dropzone.js')}}"></script>
         <style type="text/css" media="screen">
             body { padding-top: 70px; }
         </style>
@@ -64,7 +63,7 @@
                        <span class="icon-bar"></span>
                        <span class="icon-bar"></span>
                      </button>
-                     <a class="navbar-brand" href="{{url_for('home')}}">RECAST Control Center</a>
+                     <a class="navbar-brand" href="{{url_for('home')}}"><img src="{{ url_for('static',filename='img/recast-logo.svg')}}"></img> Control Center</a>
                </div>
 
 
@@ -91,25 +90,6 @@
                 </div>
             </div>
         </nav>
-
-
-        <script type="text/javascript">
-
-        // $(document).ready(function(){
-        //     console.log('hello code here to to navbar')
-        //     $('#version-selector').change(function(){
-        //         selectedoption = $('#version-selector option:selected').val()
-        //         if(selectedoption == "RECAST"){
-        //             console.log('set links for recast')
-        //         }
-        //         if(selectedoption == "RIVET"){
-        //             console.log('set links for rivet')
-        //         }
-        //     })
-        // });
-
-        </script>
-
 
         {% block prebody %}
         {% endblock %}

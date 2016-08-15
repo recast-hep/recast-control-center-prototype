@@ -1,36 +1,4 @@
-.dropzone{
-  padding:10px;
-  height:450px;
-  overflow:scroll;
-}
 
-.dz-details{
-  position:absolute;
-  color:#333;
-}
-
-.dz-success-mark, .dz-error-mark{
-  visibility:hidden;
-}
-
-.dz-success .dz-success-mark{
-  visibility: visible;
-}
-
-.dz-error .dz-error-mark{
-  visibility: visible;
-}
-
-.dz-message{
-  top:50%;
-}
-
-.dz-message span{
-  margin:auto;
-  width:50%;
-  text-align:center;
-  display:block;
-}
 
 .line:hover{
     background-color:#222;
@@ -71,4 +39,25 @@
 
 .logdatetime{
   color:#f77;padding-right:1em;
+}
+
+.navbar-inverse{
+  background-color: #2C3E50;
+}
+
+.navbar-inverse .navbar-brand {
+  height: 5em;
+  color: #3b97d3;
+}
+
+.navbar-brand img {
+  width: 10em;
+  display: inline;
+}
+
+.navbar-inverse .navbar-nav li a{
+  color: #3b97d3;
+}
+.nav{
+  margin-top: 1.5em;
 }
