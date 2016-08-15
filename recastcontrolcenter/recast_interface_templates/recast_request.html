@@ -13,17 +13,6 @@ $(document).ready(function(){
        $('#upload-zenodo-response-btn').addClass('disabled')
     {% endif  %}
 
-    var requestResultsAvailable = false
-    $.ajax(location.origin+'/status/{{request_info['uuid']}}',{
-        async: false,
-        complete: function(data){
-            requestResultsAvailable = data['responseJSON']['resultsAvailable']
-            if(!requestResultsAvailable){
-                $('#upload-response-btn').addClass('disabled')
-            }
-        }
-    })
-
     $('.process-btn').click(function(){
         basicreqid = $(this).attr('data-basic-req-id')
         backend = $(this).attr('data-backend')

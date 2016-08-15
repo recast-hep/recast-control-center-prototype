@@ -69,7 +69,7 @@ def request_point_status(basicreqid):
   print resultdir
   response = {'available':available, 'ready_backends':[]}
   if available:
-      response['ready_backends'] = os.listdir(recastbackend.resultaccess.basicreqpath(175))
+      response['ready_backends'] = os.listdir(recastbackend.resultaccess.basicreqpath(basicreqid))
   return jsonify(**response)
 
 @flask_app.route('/resultfile/<basicreqid>/<backend>/<path:filepath>')
@@ -94,7 +94,7 @@ for analysis_id,anaconfig in resultviewconfig.iteritems():
 @flask_app.route('/resultview/<basicreqid>/<backend>')
 def resultview(basicreqid,backend):
     point_id     = recastapi.request.get.basic_request(basicreqid)['point_request_id']
-    scan_id      = recastapi.request.get.point_request(169)['scan_request_id']
+    scan_id      = recastapi.request.get.point_request(point_id)['scan_request_id']
     request_info = recastapi.request.get.request(scan_id)
     analysis_id  = request_info['analysis_id']
     blueprintname = get_blueprint(resultviewconfig[analysis_id][backend]['blueprint']).name
