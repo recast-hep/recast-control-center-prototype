@@ -84,6 +84,11 @@ resultviewconfig = {
             'blueprint':'recastresultblueprints.capbackend_result.blueprint:blueprint'
         }
     }
+    3:{
+       	'capbackend': {
+            'blueprint':'recastresultblueprints.capbackend_result.blueprint:blueprint'
+        }
+    }
 }
 
 for analysis_id,anaconfig in resultviewconfig.iteritems():
