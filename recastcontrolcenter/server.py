@@ -1,3 +1,7 @@
+#must be loaded first so that env vars get set
+import recastconfig
+
+
 import gevent
 from gevent import monkey; monkey.patch_all()
 import json
@@ -13,10 +17,6 @@ from flask_sso import SSO
 from socketio import socketio_manage
 from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
-from recastbackend.catalogue import all_backend_catalogue
-
-
-import recastconfig
 
 import recastbackend.resultaccess
 from recastdb.database import db
@@ -59,9 +59,10 @@ def logout():
 @flask_app.route("/")
 def home():
     if(session.has_key('user')): session.pop('user')
-    session['user'] =  {'username':'lukas'}
+    session['user'] =  {'username':'lheinric'}
     userinfo = session.get('user',{})
     return render_template('home.html', userinfo = userinfo)
+
 @flask_app.route('/status/<basicreqid>')
 def request_point_status(basicreqid):
   resultdir = recastbackend.resultaccess.basicreqpath(basicreqid)
@@ -78,7 +79,7 @@ def resultfile(basicreqid,backend,filepath):
   return send_from_directory(os.path.dirname(fullpath),os.path.basename(fullpath))
 
 resultviewconfig = {
-    6:{
+    1:{
         'capbackend': {
             'blueprint':'recastresultblueprints.capbackend_result.blueprint:blueprint'
         }

@@ -7,12 +7,6 @@ $(document).ready(function(){
       console.log('this would be uploading the response')
     })
 
-    {% if not session.has_key('user') %}
-       $('#add-parameter-point-btn').addClass('disabled')
-       $('#upload-response-btn').addClass('disabled')
-       $('#upload-zenodo-response-btn').addClass('disabled')
-    {% endif  %}
-
     $('.process-btn').click(function(){
         basicreqid = $(this).attr('data-basic-req-id')
         backend = $(this).attr('data-backend')
@@ -52,104 +46,155 @@ $(document).ready(function(){
         })
     })
 
+
+
     $('.results-group').each(function(){
         if(!$(this).children().filter('ul').children().filter(function(){return !$(this).hasClass('disabled')}).length){
             $(this).children().filter('button').addClass('disabled')
         }
     })
 
-    {% if not session.has_key('user') %}
+    {% if not session.has_key('user') or not backends %}
        $('.process-group button').addClass('disabled')
     {% endif %}
 
 
 });
+
+function togglejobs(basireqid){
+  $('#basicreq_jobs_'+basireqid).toggleClass('hidden')
+  if ($('#basicreq_jobs_2').hasClass('hidden')){
+    $('#jobslabel_2').html('Show Processings')
+  }
+  else{
+    $('#jobslabel_2').html('Hide Processings')
+  }
+}
 </script>
 
 {% endblock %}
 
 {% block container%}
 <div class="page-header">
-    <h1>Recast Request <small>{{request_info['title']}}</small></h1>
+    <h1>Recast Scan Request <small>{{request_info['title']}}</small></h1>
 </div>
 
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
 
             <div class="panel-heading">
                 <h3 class="panel-title">Request Details</h3>
             </div>
             <div class="panel-body">
-                <dl class="dl-horizontal">
-                    {% for key in ['post_date','reason_for_request','additional_information'] %}
-                            <dt>{{key}}</dt>
-                            <dd>{{request_info[key]}}</dd>
-                    {% endfor %}
-                    <dt>analysis</dt>
-                    <dd>{{analysis_info['title']}}</dd>
-                </dl>
+                  <span class="label label-default"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> {{request_info['post_date']}}</span>
+                  <h6>Analysis</h6>
+                  <p>
+                    {{analysis_info['title']}}
+                  </p>
+                  <h6>Reason:</h6>
+                  <p>{{request_info['reason_for_request']}}</p>
+                  <h6>Additional Info:</h6>
+                  <p>{{request_info['additional_information']}}</p>
             </div>
-
-            <div class="panel-footer"></div>
         </div>
     </div> <!-- col -->
 </div> <!-- row -->
-<div class="row">
-    <div class="col-md-12">
-        <span>
-            <p>
-            <button id="upload-response-btn"type="button" class="btn btn-default" aria-label="Left Align">
-              <span class="glyphicon glyphicon-upload" aria-hidden="true" style="margin-right:1em"></span><span>Upload Result to RECAST</span>
-            </button>
-            </p>
-        </span>
-    </div> <!-- col -->
-</div> <!-- row -->
 
 <div class="row">
-  <ul class="list-group">
-  {% for i,pp in parpoints %}
-      <li class="list-group-item">
-        <h6>Parameter Point {{pp['id']}}</h6>
-        {% if basic_req_data[pp['id']] %}
-        <p>Basic Requests:</p>
-        <ul class="list-group">
-          {% for br in basic_req_data[pp['id']] %}
-            <li class="list-group-item">
-                <span>Basic Request: {{br['id']}}.</span>
-                <!-- The UI buttons -->
-                <span>
-                <!-- Single button -->
-                <div class="btn-group process-group">
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Process <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                  {% for b in ['capbackend'] %}
-                    <li><a href="#" class="btn process-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
-                  {% endfor %}
-                  </ul>
-                </div>
-                <!-- Single button -->
-                <div class="btn-group results-group">
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Results <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                  {% for b in ['capbackend'] %}
-                    <li><a href="/resultview/{{br['id']}}/{{b}}" class="btn result-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
-                  {% endfor %}
-                  </ul>
-                </div>
-              </span>
-            </li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </li>
-  {% endfor %}
-</ul>
+  <div class="col-md-12">
+    <h3>Requested Parameter Points</h3>
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+      {% for i,pp in parpoints %}
+
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading_{{loop.index}}">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{loop.index}}" aria-expanded="true" aria-controls="collapse_{{loop.index}}">
+              Parameter Point {{loop.index}}
+            </a>
+          </h4>
+        </div>
+        <div id="collapse_{{loop.index}}" class="panel-collapse collapse {{'%s' % 'in' if loop.index == 1}}" role="tabpanel" aria-labelledby="heading_{{loop.index}}">
+          <div class="panel-body">
+            {% if basic_req_data[pp['id']] %}
+            <ul class="list-group">
+              {% for br in basic_req_data[pp['id']] %}
+                <li class="list-group-item">
+                    <strong>Basic Request {{loop.index}}: </strong>
+                    <!-- The UI buttons -->
+                    <span>
+                    <!-- Single button -->
+                    <div class="btn-group process-group">
+                      <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Process <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      {% for b in backends %}
+                        <li><a href="#" class="btn btn-xs process-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                    <button id="upload-response-btn"type="button" class="btn btn-primary btn-xs" aria-label="Left Align" onclick="togglejobs({{br['id']}})">
+                      <span class="glyphicon glyphicon-tasks" aria-hidden="true" style="margin-right:1em"></span><span id="jobslabel_{{br['id']}}">Show Processings</span>
+                    </button>
+                    <!-- Single button -->
+                    <div class="btn-group results-group">
+                      <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Results <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      {% for b in backends %}
+                        <li><a href="/resultview/{{br['id']}}/{{b}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                    <button id="upload-response-btn"type="button" class="btn btn-primary btn-xs" aria-label="Left Align">
+                      <span class="glyphicon glyphicon-upload" aria-hidden="true" style="margin-right:1em"></span><span>Upload to RECAST</span>
+                    </button>
+                  </span>
+                  <div id="basicreq_jobs_{{br['id']}}" class="hidden">
+                    <h6>Backend Information:</h6>
+
+                    {%
+                      set state_map = {'SUCCESS':['ok','success'],'FAILURE':['remove','danger'],'PENDING':['hourglass','active'],'STARTED':['cog','info']}
+                    %}
+
+                    {% for jobdata in processing_info[br['id']] %}
+                      <div>
+                        <span style="font-family:monospace;">{{jobdata['job']}}</a></span>
+                        <span class="label label-{{state_map[jobdata['celery']][1]}}"><span class="glyphicon glyphicon-{{state_map[jobdata['celery']][0]}}" aria-hidden="true"></span></span>
+                        <a href="/monitor/{{jobdata['job']}}"><span class="label label-default"><span class="glyphicon glyphicon-console" aria-hidden="true"></span> Logs</a></span></a>
+                      </div>
+                    {% endfor %}
+
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <div class="col-md-12">
+    <ul class="list-group">
+    {% for i,pp in parpoints %}
+        <li class="list-group-item">
+          <h6>Parameter Point {{pp['id']}}</h6>
+        </li>
+    {% endfor %}
+  </ul>
+  </div>
+</div>
+
+
 
 <div id="upload-modal" class="modal fade">
   <div class="modal-dialog">

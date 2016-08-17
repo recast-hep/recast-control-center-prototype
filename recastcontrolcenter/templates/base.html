@@ -8,7 +8,7 @@
     <title>RECAST - An Analysis Reinterpretation Framework</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css')}}">"
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -68,13 +68,6 @@
 
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <!-- <form class="navbar-form navbar-left" role="search">
-                        <select  name="analysis-uuid" class="form-control" id="version-selector">
-                            <option value="RECAST">RECAST</option>
-                            <option value="RIVET">RIVET</option>
-                        </select>
-                    </form> -->
-
                     <ul class="nav navbar-nav">
                         <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
                     </ul>

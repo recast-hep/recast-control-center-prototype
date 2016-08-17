@@ -15,9 +15,9 @@ celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).a
 class MonitoringNamespace(BaseNamespace,RoomsMixin):
   def subscriber(self):
     print "subscribing to redis socket.io#emitter"
-    red = redis.StrictRedis(host = os.environ['CELERY_REDIS_HOST'],
-                            db = os.environ['CELERY_REDIS_DB'],
-                            port = os.environ['CELERY_REDIS_PORT'])
+    red = redis.StrictRedis(host = os.environ['RECAST_CELERY_REDIS_HOST'],
+                            db = os.environ['RECAST_CELERY_REDIS_DB'],
+                            port = os.environ['RECAST_CELERY_REDIS_PORT'])
     pubsub = red.pubsub()
     pubsub.subscribe('socket.io#emitter')
     self.emit('subscribed')
@@ -33,27 +33,22 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     print "getting stored messages for room {}".format(self.jobguid)
     stored = recastbackend.messaging.get_stored_messages(self.jobguid)
 
-    print "got {}".format(stored)
+    connected_msg = {'date': 'connected', 'msg': ''}
+    self.emit('room_msg',connected_msg)
 
     for m in stored:
       old_msg_data =  json.loads(m)
-      print old_msg_data
-
       for_emit = ['room_msg', old_msg_data]
       self.emit(*for_emit)
 
+
     for m in pubsub.listen():
-      # print m
       if m['type'] == 'message':
         data =  msgpack.unpackb(m['data'])[0]
         extras =  msgpack.unpackb(m['data'])[1]
 
         print 'msgpack payload: {}'.format(data)
         print 'msgpack extras: {}'.format(extras)
-        #
-        #
-        # print 'NB: self rooms are {}'.format(self.session['rooms'])
-        #
         if(data['nsp'] == '/monitor'):
           if(extras['rooms']):
             for room in extras['rooms']:

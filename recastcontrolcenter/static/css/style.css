@@ -61,3 +61,17 @@
 .nav{
   margin-top: 1.5em;
 }
+
+
+.btn-info {
+    background-color: #3b97d3;
+    color: white;
+    border: none;
+    font-weight: bolder;
+}
+
+.btn-info:hover {
+    background-color: #3e9fde;
+    color: white;
+    border: none;
+}

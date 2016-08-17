@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-        
+
 {% block prebody %}
 <script type="text/javascript">
 $(document).ready(function(){
@@ -12,21 +12,28 @@ $(document).ready(function(){
     socket.on('room_msg', function (data) {
             console.log('got msg from room');
             console.log(data)
-            $('.logwindow').append('<div class="line"><span><code class="timestamp">'+data['date']+'</code></span><span><code class="message">'+data['msg']+'</code></span></div>')
+            $('.logwindow').append('<div class="line"><span><code class="timestamp">'+data['date']+'</code></span><span><code class="message">'+escapeHTML(data['msg'])+'</code></span></div>')
         });
 });
+
+function escapeHTML(s) {
+    return s.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
 </script>
 {% endblock %}
 
 {% block container%}
 <div class="page-header">
     <h1>Job Monitor <small>for job {{jobguid}}</small></h1>
-</div>    
+</div>
 
 
 <div class="row">
     <div class="col-md-14">
-        <p>Messages from the request processor will appear below.</p>
+        <p>Messages from the request processor will appear below. </p>
 	<div class="logwindow"></div>
     </div>
 </div>

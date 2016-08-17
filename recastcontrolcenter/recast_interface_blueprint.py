@@ -11,6 +11,11 @@ from flask import Blueprint, render_template, jsonify, request, session
 import recastcontrolcenter.backendtasks as asynctasks
 from recastbackend.catalogue import getBackends
 
+
+
+import logging
+log = logging.getLogger(__name__)
+
 celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).app
 celery_app.set_current()
 
@@ -32,18 +37,35 @@ def recast_request_view(reqid):
     p['id']:recastapi.request.get.basic_requests_for_point(p['id'])['_items']
         for p in parpoints
   }
-  status_info = {}
+
+
+  backends = getBackends(analysis_id)
+
+  from recastbackend.jobstate import get_flattened_jobs
+  processing_info = {}
+  for k,v in basic_req_data.iteritems():
+      for basic_req in v:
+          processing_info[basic_req['id']] = get_flattened_jobs(celery_app,basic_req['id'],backends)
+
+  log.info('proc info is %s',processing_info)
+
   return render_template('recast_request.html', request_info  = request_info,
                                                 parpoints = enumerate(parpoints),
                                                 basic_req_data = basic_req_data,
                                                 analysis_info = analysis_info,
-                                                # backends      = getBackends(request_info['analysis-uuid']),
-                                                status_info   = status_info)
+                                                backends      = backends,
+                                                processing_info   = processing_info)
 
 @recast.route('/requests')
 def recast_requests_view():
   requests_info = recastapi.request.get.request()
-  return render_template('recast_all_requests.html', requests_info = reversed(requests_info))
+  backend_data = {}
+  for req in requests_info:
+      backend_data[req['id']] = getBackends(req['analysis_id'])
+  return render_template('recast_all_requests.html',
+    requests_info = reversed(requests_info),
+    backend_data = backend_data
+  )
 
 @recast.route('/processBasicRequest', methods=['GET'])
 def process_request_point():
@@ -54,7 +76,7 @@ def process_request_point():
   from recastbackend.submission import submit_recast_request
   jobguid,result = submit_recast_request(basicreqid,analysisid,backend)
 
-  print "jobguid is: {}, celery id is: {}".format(jobguid,result)
+  log.info('jobguid is: %s, celery id is: %s',jobguid,result)
   return jsonify(jobguid=jobguid)
 
 
