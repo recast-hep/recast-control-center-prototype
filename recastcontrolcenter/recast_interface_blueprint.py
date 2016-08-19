@@ -19,22 +19,22 @@ log = logging.getLogger(__name__)
 celery_app  = importlib.import_module(recastconfig.config['RECAST_CELERYAPP']).app
 celery_app.set_current()
 
-import recastapi.request.get
-import recastapi.analysis.get
+import recastapi.request.read
+import recastapi.analysis.read
 import recastbackend.jobstate
 
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
 
 @recast.route('/request/<reqid>')
 def recast_request_view(reqid):
-  request_info = recastapi.request.get.request(reqid)
+  request_info = recastapi.request.read.scan_request(reqid)
 
-  analysis_id = recastapi.request.get.request(reqid)['analysis_id']
-  analysis_info = recastapi.analysis.get.analysis(analysis_id)
+  analysis_id = recastapi.request.read.scan_request(reqid)['analysis_id']
+  analysis_info = recastapi.analysis.read.analysis(analysis_id)
 
-  parpoints = recastapi.request.get.point_requests_for_scan(reqid)['_items']
+  parpoints = recastapi.request.read.point_request_of_scan(reqid)
   basic_req_data = {
-    p['id']:recastapi.request.get.basic_requests_for_point(p['id'])['_items']
+    p['id']:recastapi.request.read.basic_request_of_point(p['id'])
         for p in parpoints
   }
 
@@ -45,6 +45,7 @@ def recast_request_view(reqid):
   processing_info = {}
   for k,v in basic_req_data.iteritems():
       for basic_req in v:
+          print 'basic_req',basic_req
           processing_info[basic_req['id']] = get_flattened_jobs(celery_app,basic_req['id'],backends)
 
   log.info('proc info is %s',processing_info)
@@ -58,7 +59,7 @@ def recast_request_view(reqid):
 
 @recast.route('/requests')
 def recast_requests_view():
-  requests_info = recastapi.request.get.request()
+  requests_info = recastapi.request.read.scan_request()
   backend_data = {}
   for req in requests_info:
       backend_data[req['id']] = getBackends(req['analysis_id'])

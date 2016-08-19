@@ -8,7 +8,7 @@ import json
 import os
 import importlib
 import pkg_resources
-import recastapi.request
+import recastapi.request.read
 import flask
 import recastcontrolcenter.backendtasks as asynctasks
 
@@ -99,9 +99,9 @@ for analysis_id,anaconfig in resultviewconfig.iteritems():
 
 @flask_app.route('/resultview/<basicreqid>/<backend>')
 def resultview(basicreqid,backend):
-    point_id     = recastapi.request.get.basic_request(basicreqid)['point_request_id']
-    scan_id      = recastapi.request.get.point_request(point_id)['scan_request_id']
-    request_info = recastapi.request.get.request(scan_id)
+    point_id     = recastapi.request.read.basic_request(basicreqid)['point_request_id']
+    scan_id      = recastapi.request.read.point_request(point_id)['scan_request_id']
+    request_info = recastapi.request.read.scan_request(scan_id)
     analysis_id  = request_info['analysis_id']
     blueprintname = get_blueprint(resultviewconfig[analysis_id][backend]['blueprint']).name
     return redirect(url_for('{}.result_view'.format(blueprintname), basicreqid = basicreqid))

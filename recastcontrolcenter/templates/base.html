@@ -74,7 +74,8 @@
 
                     <ul class="nav navbar-nav navbar-right">
                     {% if session.has_key('user') %}
-                        <li id="nav-allreq"><a href="/logout">Logged in as {{session['user']['username']}}. Logout</a></li>
+                        <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}}</a></li>
+                        <li id="nav-allreq"><a href="/logout">Logout</a></li>
                     {% else %}
                         <li id="nav-allreq"><a href="/login">Login</a></li>
                     {% endif %}
