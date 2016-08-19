@@ -8,7 +8,7 @@ services:
     command: recast-control-center server
     #stdin_open: true
     #tty: true
-    image: recastcc
+    image: lukasheinrich/recast-control-center
     environment:
       - RECAST_CELERY_REDIS_HOST=redis
       - RECAST_CELERY_REDIS_PORT=6379
