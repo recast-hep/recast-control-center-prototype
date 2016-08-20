@@ -1,11 +1,10 @@
 import click
-from socketio.server import serve
 import os
 import yaml
 import pkg_resources
 import subprocess
 import logging
-
+from socketio.server import serve
 logging.basicConfig(level = logging.INFO)
 
 @click.group()

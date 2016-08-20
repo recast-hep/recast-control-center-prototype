@@ -1,6 +1,7 @@
 import json
 import requests
 import os
+import uuid
 import glob
 import zipfile
 import pickle
@@ -22,6 +23,7 @@ celery_app.set_current()
 import recastapi.request.read
 import recastapi.analysis.read
 import recastbackend.jobstate
+import recastapi.response.write
 
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')
 
@@ -86,15 +88,22 @@ def zipdir(path, zip):
         for file in files:
             zip.write(os.path.join(root, file),os.path.join(root, file).split('/',2)[-1])
 
-@recast.route('/updateResponse/<request_uuid>')
-def uploadresults(request_uuid):
-  if not session.has_key('user'):
-    return jsonify(error = 'not authorized')
+def prepareupload(fullpath):
+    stagingarea = '{}/stagingarea'.format(os.environ['RECAST_STORAGEPATH'])
+    if not os.path.exists(stagingarea):
+        os.makedirs(stagingarea)
+    zipfilename = '{}/uploadfile_{}.zip'.format(stagingarea,uuid.uuid4())
+    zipdir(fullpath,zipfile.ZipFile(zipfilename,'w'))
+    return zipfilename
 
-  return jsonify(error = 'not implemented')
+@recast.route('/uploadPointResponse')
+def uploadresults():
+    if not session.has_key('user'):
+        return jsonify(error = 'not authorized')
 
-@recast.route('/uploadzenodo/<request_uuid>')
-def uploadresultszenodo(request_uuid):
-  if not session.has_key('user'):
-    return jsonify(error = 'not authorized')
-  return jsonify(error = 'not implemented')
+    fullpath = recastbackend.resultaccess.basicreqpath(request.args['basicreqid'])
+    zipfilename = prepareupload(fullpath)
+    scan_response = recastapi.response.write.scan_response(request.args['scanreqid'])
+    point_response = recastapi.response.write.point_response(scan_response['id'],request.args['pointreqid'],{'lower_2sig_expected_CLs':-3.0})
+    recastapi.response.write.basic_response_with_archive(point_response['id'],request.args['basicreqid'],zipfilename,{'lower_2sig_expected_CLs':-4.0})
+    return jsonify(success = 'ok...')

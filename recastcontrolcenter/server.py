@@ -1,6 +1,8 @@
 #must be loaded first so that env vars get set
 import recastconfig
 
+import recastapi
+print '_____',recastapi.ACCESS_TOKEN
 
 import gevent
 from gevent import monkey; monkey.patch_all()
@@ -8,7 +10,6 @@ import json
 import os
 import importlib
 import pkg_resources
-import recastapi.request.read
 import flask
 import recastcontrolcenter.backendtasks as asynctasks
 
