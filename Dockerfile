@@ -34,4 +34,4 @@ RUN adduser --uid 1000 --disabled-password --gecos '' recast && \
     chown -R recast:recast /code
 
 # Start the application:
-USER recast
+# USER recast
