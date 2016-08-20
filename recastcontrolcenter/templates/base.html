@@ -8,7 +8,9 @@
     <title>RECAST - An Analysis Reinterpretation Framework</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css')}}">"
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> -->
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css')}}">
     <link rel="shortcut icon" type="image/png" href="{{ url_for('static',filename='assets/recast.ico')}}"/>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -42,60 +44,30 @@
     </script>
 
     <!-- <script type="text/javascript" src="{{ url_for('static',filename='js/underscore-min.js')}}"></script> -->
-    </head>
-    <body>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.17/socket.io.js"></script>
+</head>
+<body>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.17/socket.io.js"></script>
 
 
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-        <!-- Include all compiled plugins (below), or include individual files as needed -->
-        <script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
-        <style type="text/css" media="screen">
-            body { padding-top: 70px; }
-        </style>
-        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
-            <div class="container-fluid">
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
+  <style type="text/css" media="screen">
+      body { padding-top: 70px; }
+  </style>
 
-                <div class="navbar-header">
-                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                       <span class="sr-only">Toggle navigation</span>
-                       <span class="icon-bar"></span>
-                       <span class="icon-bar"></span>
-                       <span class="icon-bar"></span>
-                     </button>
-                     <a class="navbar-brand" href="{{url_for('home')}}"><img src="{{ url_for('static',filename='img/recast-logo.svg')}}"></img> Control Center</a>
-               </div>
+  {% include "nav.html" %}
 
+  {% block prebody %}
+  {% endblock %}
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav">
-                        <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
-                    </ul>
+  <div class="container">
+      {% block container %}
+      <div id="row" style="background-color:red;">
+          hello
+      </div>
+      {% endblock %}
+  </div>
 
-                    <ul class="nav navbar-nav navbar-right">
-                    {% if session.has_key('user') %}
-                        <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}}</a></li>
-                        <li id="nav-allreq"><a href="/logout">Logout</a></li>
-                    {% else %}
-                        <li id="nav-allreq"><a href="/login">Login</a></li>
-                    {% endif %}
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        {% block prebody %}
-        {% endblock %}
-
-        <div class="container">
-            {% block container %}
-            <div id="row" style="background-color:red;">
-                hello
-            </div>
-            {% endblock %}
-        </div>
-
-
-    </body>
-    </html>
+</body>
+</html>
