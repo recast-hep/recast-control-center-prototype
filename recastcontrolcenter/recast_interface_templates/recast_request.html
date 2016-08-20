@@ -64,7 +64,7 @@ $(document).ready(function(){
       }),{
           async: false,
           complete: function(data){
-              console.log(data['responseJSON'])
+              $('#upload-modal').modal()
           }
       })
     })
