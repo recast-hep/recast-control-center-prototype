@@ -121,7 +121,7 @@ function togglejobs(basicreqid){
         <div class="panel-heading" role="tab" id="heading_{{loop.index}}">
           <h4 class="panel-title">
             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{loop.index}}" aria-expanded="true" aria-controls="collapse_{{loop.index}}">
-              Parameter Point {{loop.index}}, {{pp['id']}}
+              Parameter Point {{loop.index}}
             </a>
           </h4>
         </div>
@@ -131,7 +131,7 @@ function togglejobs(basicreqid){
             <ul class="list-group">
               {% for br in basic_req_data[pp['id']] %}
                 <li class="list-group-item">
-                    <strong>Basic Request {{loop.index}} {{br['id']}}: </strong>
+                    <strong>Basic Request {{loop.index}}: </strong>
                     <!-- The UI buttons -->
                     <span>
                     <!-- Single button -->
