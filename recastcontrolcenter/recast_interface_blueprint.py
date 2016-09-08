@@ -96,14 +96,21 @@ def prepareupload(fullpath):
     zipdir(fullpath,zipfile.ZipFile(zipfilename,'w'))
     return zipfilename
 
+import recastbackend.resultextraction
+
 @recast.route('/uploadPointResponse')
 def uploadresults():
     if not session.has_key('user'):
         return jsonify(error = 'not authorized')
 
-    fullpath = recastbackend.resultaccess.basicreqpath(request.args['basicreqid'])
+    fullpath = recastbackend.resultaccess.basicreq_backendpath(request.args['basicreqid'],request.args['backend'])
     zipfilename = prepareupload(fullpath)
     scan_response = recastapi.response.write.scan_response(request.args['scanreqid'])
-    point_response = recastapi.response.write.point_response(scan_response['id'],request.args['pointreqid'],{'lower_2sig_expected_CLs':-3.0})
-    recastapi.response.write.basic_response_with_archive(point_response['id'],request.args['basicreqid'],zipfilename,{'lower_2sig_expected_CLs':-4.0})
+    analysis_id = recastapi.request.read.scan_request(request.args['scanreqid'])['analysis_id']
+
+    resultdata = recastbackend.resultextraction.extract_result(fullpath,analysis_id,request.args['backend'])
+
+    point_response = recastapi.response.write.point_response(scan_response['id'], request.args['pointreqid'], resultdata)
+    recastapi.response.write.basic_response_with_archive(point_response['id'], request.args['basicreqid'], zipfilename, resultdata)
+
     return jsonify(success = 'ok...')

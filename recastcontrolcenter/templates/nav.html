@@ -1,0 +1,29 @@
+<nav class="navbar navbar-default navbar-fixed-top top-bar">
+    <div class="container-fluid">
+
+        <div class="navbar-header">
+             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+             </button>
+             <a class="navbar-brand" style="padding: 0" href="/"><div class="pull-left recast-logo"></div></a>
+
+       </div>
+
+
+       <div class="collapse navbar-collapse menu" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
+            {% if session.has_key('user') %}
+                <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}}</a></li>
+                <li id="nav-allreq"><a href="/logout"><i class="glyphicon glyphicon-log-out"></i>&nbsp;Logout</a></li>
+            {% else %}
+                <li id="nav-allreq"><a href="/login">Login</a></li>
+            {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</nav>

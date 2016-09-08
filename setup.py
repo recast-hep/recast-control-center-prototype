@@ -23,7 +23,8 @@ setup(
     'Flask',
     'Flask-SSO',
     'Click',
-    'IPython'
+    'IPython',
+    'pyyaml'
   ],
   entry_points = {
     'console_scripts': [

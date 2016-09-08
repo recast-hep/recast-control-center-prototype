@@ -2,7 +2,6 @@
 import recastconfig
 
 import recastapi
-print '_____',recastapi.ACCESS_TOKEN
 
 import gevent
 from gevent import monkey; monkey.patch_all()
@@ -79,24 +78,18 @@ def resultfile(basicreqid,backend,filepath):
   fullpath = recastbackend.resultaccess.resultfilepath(basicreqid,backend,filepath)
   return send_from_directory(os.path.dirname(fullpath),os.path.basename(fullpath))
 
-resultviewconfig = {
-    1:{
-        'capbackend': {
-            'blueprint':'recastresultblueprints.capbackend_result.blueprint:blueprint'
-        }
-    },
-    3:{
-       	'capbackend': {
-            'blueprint':'recastresultblueprints.capbackend_result.blueprint:blueprint'
-        }
-    }
-}
+import yaml
+backendconfig = yaml.load(pkg_resources.resource_stream('recastcontrolcenter','resources/backendconfig.yml'))
 
-for analysis_id,anaconfig in resultviewconfig.iteritems():
-    for backend,backendconfig in anaconfig.iteritems():
-        blueprint = get_blueprint(backendconfig['blueprint'])
-        flask_app.register_blueprint(blueprint, url_prefix='/'+str(analysis_id))
-
+resultviewconfig = {}
+for resultview in backendconfig['resultviewconfig']:
+    blueprint = get_blueprint(resultview['blueprint'])
+    flask_app.register_blueprint(blueprint, url_prefix='/{}/{}'.format(
+        resultview['analysis'],
+        resultview['backend']
+    ))
+    analysis_backend = resultviewconfig.setdefault(resultview['analysis'],{}).setdefault(resultview['backend'],{})
+    analysis_backend['blueprint'] = resultview['blueprint']
 
 @flask_app.route('/resultview/<basicreqid>/<backend>')
 def resultview(basicreqid,backend):

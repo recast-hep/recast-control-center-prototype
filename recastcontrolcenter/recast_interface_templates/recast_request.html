@@ -60,7 +60,8 @@ $(document).ready(function(){
       $.ajax(location.origin+'/recast/uploadPointResponse?'+$.param({
         scanreqid: {{request_info['id']}},
         basicreqid: button.attr('data-basic-req-id'),
-        pointreqid: button.attr('data-point-req-id')
+        pointreqid: button.attr('data-point-req-id'),
+        backend: button.attr('data-backend')
       }),{
           async: false,
           complete: function(data){
@@ -159,10 +160,29 @@ function togglejobs(basicreqid){
                       {% endfor %}
                       </ul>
                     </div>
-                    <button type="button" data-basic-req-id="{{br['id']}}" data-point-req-id="{{pp['id']}}"
+
+
+                    <!-- Single button -->
+                    <div class="btn-group results-group">
+                      <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="glyphicon glyphicon-upload" aria-hidden="true" style="margin-right:1em"></span> <span>Upload to RECAST</span> <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                      {% for b in backends %}
+                        <li><a class="btn btn-xs upload-response-btn"
+                              data-point-req-id="{{pp['id']}}"
+                              data-basic-req-id="{{br['id']}}"
+                              data-backend="{{b}}">{{b}}</a>
+                        </li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+
+
+                    <!-- <button type="button" data-basic-req-id="{{br['id']}}" data-point-req-id="{{pp['id']}}"
                     class="btn btn-primary btn-xs upload-response-btn" aria-label="Left Align">
                       <span class="glyphicon glyphicon-upload" aria-hidden="true" style="margin-right:1em"></span><span>Upload to RECAST</span>
-                    </button>
+                    </button> -->
                   </span>
                   <div id="basicreq_jobs_{{br['id']}}" class="hidden">
                     <h6>Backend Information:</h6>
