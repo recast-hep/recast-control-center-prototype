@@ -17,7 +17,7 @@ def server(config):
   if config:
     os.environ['RECASTCONTROLCENTER_CONFIG'] = config
   import server
-  serve(server.flask_app, port = 8000, host = '0.0.0.0', transports = 'xhr-polling',
+  serve(server.flask_app, port = os.environ['RECAST_SERVER_PORT'], host = '0.0.0.0', transports = 'xhr-polling',
         certfile = os.environ['RECAST_SSL_CERTFILE'], keyfile = os.environ['RECAST_SSL_KEYFILE'])
 
 @servercli.command()

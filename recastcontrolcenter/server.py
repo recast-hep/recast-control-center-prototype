@@ -55,24 +55,51 @@ oauth_app = oauth.remote_app('oauth_app',
     access_token_method = 'POST'
 )
 
-
+import requests
 def user_data(access_token):
     r = requests.get('https://oauthresource.web.cern.ch/api/Me',
-        headers = {'Authorization':'Bearer {}'.format(session['access_token'])})
+        headers = {'Authorization':'Bearer {}'.format(access_token)})
     return r.json()
+
+
 
 @flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
 @oauth_app.authorized_handler
 def oauth_redirect(resp):
-    session['access_token'] = resp['access_token']
-    data = user_data(session['access_token'])
+    print 'callback received'
+    global session_store
+
+    next_url = request.args.get('next') or url_for('home')
+    if resp is None:
+        return redirect(next_url)
+
+    # session['access_token'] = resp['access_token']
+    data = user_data(resp['access_token'])
     print 'this is the login!'
-    print data
-    return jsonify(data)
+
+    session['user'] = {}
+
+    for x in data:
+        if x['Type']=='http://schemas.xmlsoap.org/claims/Firstname':
+            session['user']['firstname'] = x['Value']
+        if x['Type']=='http://schemas.xmlsoap.org/claims/Lastname"':
+            session['user']['lastname'] = x['Value']
+        if x['Type']=='http://schemas.xmlsoap.org/claims/CommonName':
+            session['user']['username'] = x['Value']
+
+    print 'user is',session['user']['username']
+    print session.keys()
+    print 'sess obj oauth',id(session)
+    print session
+    return redirect(next_url)
+    # return '<a href=https://recast-control.cern.ch/>HOME</a>'
+    # return redirect('/whaaat')
 
 @flask_app.route('/login')
 def login():
-    redirect_uri = config['RECAST_BASEURL']+config['RECAST_OAUTH_REDIRECT_ROUTE']
+    redirect_uri = recastconfig.config['RECAST_BASEURL']+url_for('oauth_redirect')
+
+    print 'login with callback: {}'.format(redirect_uri)
     return oauth_app.authorize(callback=redirect_uri)
 
 @flask_app.route('/logout')
@@ -85,11 +112,16 @@ def logout():
 #
 @flask_app.route("/")
 def home():
-    if config['RECAST_OAUTH_DUMMYLOGIN']:
-        if(session.has_key('user')): session.pop('user')
-        session['user'] =  {'username':'lheinric'}
-    userinfo = session.get('user',{})
-    return render_template('home.html', userinfo = userinfo)
+    print 'home'
+    print 'sess obj home',id(session)
+    print 'session!',session.keys()
+    for k,v in session.iteritems():
+        print '{} -> {}'.format(k,v)
+    # if recastconfig.config['RECAST_OAUTH_DUMMYLOGIN']:
+    #     if(session.has_key('user')): session.pop('user')
+    #     session['user'] =  {'username':'lheinric'}
+    #     userinfo = session.get('user',{})
+    return render_template('home.html')
 
 @flask_app.route('/status/<basicreqid>')
 def request_point_status(basicreqid):

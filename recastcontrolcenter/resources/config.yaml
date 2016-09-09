@@ -10,4 +10,6 @@ RECAST_OAUTUH_AUTHORIZEURL: 'https://oauth.web.cern.ch/OAuth/Authorize'
 RECAST_OAUTH_APPID: 'recastcontrol'
 RECAST_OAUTH_SECRET: ''
 RECAST_OAUTH_REDIRECT_ROUTE: '/oauth'
-RECAST_BASEURL: 
+RECAST_BASEURL: https://recast-control.cern.ch
+RECAST_SERVER_PORT: 8000
+RECAST_OAUTH_DUMMYLOGIN: false
