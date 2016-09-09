@@ -21,7 +21,7 @@ setup(
     'recast-resultblueprints',
     'recast-database',
     'Flask',
-    'Flask-SSO',
+    'Flask-OAuth',
     'Click',
     'IPython',
     'pyyaml'

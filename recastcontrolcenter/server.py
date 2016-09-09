@@ -13,7 +13,6 @@ import flask
 import recastcontrolcenter.backendtasks as asynctasks
 
 from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for, abort
-from flask_sso import SSO
 from socketio import socketio_manage
 from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
@@ -42,11 +41,39 @@ def create_app(config = None):
 flask_app = create_app()
 
 
-sso_extension = SSO(app=flask_app)
-@sso_extension.login_handler
-def login(user_info):
-  session['user'] = user_info
-  return redirect('/')
+from flask_oauth import OAuth
+oauth = OAuth()
+oauth_app = oauth.remote_app('oauth_app',
+    base_url=None,
+    request_token_url=None,
+    access_token_url=recastconfig.config['RECAST_OAUTH_TOKENURL'],
+    authorize_url=recastconfig.config['RECAST_OAUTUH_AUTHORIZEURL'],
+    consumer_key = recastconfig.config['RECAST_OAUTH_APPID'],
+    consumer_secret = recastconfig.config['RECAST_OAUTH_SECRET'],
+    request_token_params= {'response_type':'code','scope':'bio'},
+    access_token_params = {'grant_type':'authorization_code'},
+    access_token_method = 'POST'
+)
+
+
+def user_data(access_token):
+    r = requests.get('https://oauthresource.web.cern.ch/api/Me',
+        headers = {'Authorization':'Bearer {}'.format(session['access_token'])})
+    return r.json()
+
+@flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
+@oauth_app.authorized_handler
+def oauth_redirect(resp):
+    session['access_token'] = resp['access_token']
+    data = user_data(session['access_token'])
+    print 'this is the login!'
+    print data
+    return jsonify(data)
+
+@flask_app.route('/login')
+def login():
+    redirect_uri = config['RECAST_BASEURL']+config['RECAST_OAUTH_REDIRECT_ROUTE']
+    return oauth_app.authorize(callback=redirect_uri)
 
 @flask_app.route('/logout')
 def logout():
@@ -58,8 +85,9 @@ def logout():
 #
 @flask_app.route("/")
 def home():
-    if(session.has_key('user')): session.pop('user')
-    session['user'] =  {'username':'lheinric'}
+    if config['RECAST_OAUTH_DUMMYLOGIN']:
+        if(session.has_key('user')): session.pop('user')
+        session['user'] =  {'username':'lheinric'}
     userinfo = session.get('user',{})
     return render_template('home.html', userinfo = userinfo)
 
