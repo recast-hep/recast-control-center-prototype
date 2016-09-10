@@ -188,7 +188,7 @@ function togglejobs(basicreqid){
                     <h6>Backend Information:</h6>
 
                     {%
-                      set state_map = {'SUCCESS':['ok','success'],'FAILURE':['remove','danger'],'PENDING':['hourglass','active'],'STARTED':['cog','info']}
+                      set state_map = {'SUCCESS':['ok','success'],'FAILURE':['remove','danger'],'PENDING':['hourglass','warning'],'STARTED':['cog','info']}
                     %}
 
                     {% for jobdata in processing_info[br['id']] %}

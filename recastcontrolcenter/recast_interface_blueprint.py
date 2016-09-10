@@ -61,14 +61,19 @@ def recast_request_view(reqid):
 
 @recast.route('/requests')
 def recast_requests_view():
-  requests_info = recastapi.request.read.scan_request()
-  backend_data = {}
-  for req in requests_info:
-      backend_data[req['id']] = getBackends(req['analysis_id'])
-  return render_template('recast_all_requests.html',
-    requests_info = reversed(requests_info),
-    backend_data = backend_data
-  )
+    requests_info = recastapi.request.read.scan_request()
+    backend_data = {}
+    for req in requests_info:
+        print 'analysis id for req',req['id'],'is',req['analysis_id']
+        backend_data[req['id']] = getBackends(req['analysis_id'])
+
+
+    print backend_data
+
+    return render_template('recast_all_requests.html',
+        requests_info = reversed(requests_info),
+        backend_data = backend_data
+    )
 
 @recast.route('/processBasicRequest', methods=['GET'])
 def process_request_point():
