@@ -36,7 +36,7 @@
               <tr>
                 <td><a href=/recast/request/{{row['id']}}>{{row['title']}}</a></td>
                 <td>
-                  {% for b in backend_data[row['id']] %}
+                  {% for b in wflow_config_data[row['id']] %}
                     <span class="label label-default"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{b}}</span>
                   {% endfor %}
                 </td>

@@ -1,10 +1,6 @@
+blueprintconfig:
+  - prefix: yadageresult
+    blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
 resultviewconfig:
-  - analysis: 1
-    backend: capbackend
-    blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
-  - analysis: 2
-    backend: capbackend
-    blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
-  - analysis: 3
-    backend: capbackend
+  - wflowconfigname: dummyconfig
     blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint

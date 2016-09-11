@@ -4,9 +4,17 @@
 <script type="text/javascript">
 $(document).ready(function(){
     $('.process-btn').click(function(){
-        basicreqid = $(this).attr('data-basic-req-id')
-        backend = $(this).attr('data-backend')
-        url = location.origin+'/recast/processBasicRequest?basicreqid='+basicreqid+'&backend='+backend+'&analysisid='+{{analysis_info['id']}}
+        var button = $(this);
+        basicreqid = button.attr('data-basic-req-id')
+        wflowconfig = button.attr('data-wflowconfig')
+
+        url = location.origin+'/recast/processBasicRequest?'+$.param({
+          scanreqid: {{request_info['id']}},
+          wflowconfig: button.attr('data-wflowconfig'),
+          basicreqid: basicreqid
+        })
+
+
         $.ajax(url,{
             complete: function(data){
                 var jobguid = data['responseJSON']['jobguid']
@@ -20,9 +28,8 @@ $(document).ready(function(){
     $('.result-btn').each(function(){
         var button = $(this)
 
-        backend = button.attr('data-backend')
         var basicReqId = button.attr('data-basic-req-id')
-        var backend = button.attr('data-backend')
+        var wflowconfig = button.attr('data-wflowconfig')
         var resultsAvailable = false
 
         var url = location.origin+'/status/'+basicReqId
@@ -30,9 +37,9 @@ $(document).ready(function(){
             async: false,
             complete: function(data){
                 console.log(data['responseJSON'])
-                console.log(data['responseJSON']['ready_backends'])
-                console.log(backend)
-                resultsAvailable = $.inArray(backend,data['responseJSON']['ready_backends']) >= 0
+                console.log(data['responseJSON']['ready_wflowconfigs'])
+                console.log(wflowconfig)
+                resultsAvailable = $.inArray(wflowconfig,data['responseJSON']['ready_wflowconfigs']) >= 0
                 console.log('results are available: '+ resultsAvailable)
                 if(!resultsAvailable){
                   console.log('disabling button')
@@ -50,7 +57,7 @@ $(document).ready(function(){
         }
     })
 
-    {% if not session.has_key('user') or not backends %}
+    {% if not session.has_key('user') or not wflow_configs %}
        $('.process-group button').addClass('disabled')
     {% endif %}
 
@@ -61,10 +68,11 @@ $(document).ready(function(){
         scanreqid: {{request_info['id']}},
         basicreqid: button.attr('data-basic-req-id'),
         pointreqid: button.attr('data-point-req-id'),
-        backend: button.attr('data-backend')
+        wflowconfig: button.attr('data-wflowconfig')
       }),{
           async: false,
           complete: function(data){
+              console.log(data)
               $('#upload-modal').modal()
           }
       })
@@ -141,8 +149,8 @@ function togglejobs(basicreqid){
                         Process <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                      {% for b in backends %}
-                        <li><a href="#" class="btn btn-xs process-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% for wc in wflow_configs %}
+                        <li><a href="#" class="btn btn-xs process-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}</a></li>
                       {% endfor %}
                       </ul>
                     </div>
@@ -155,8 +163,8 @@ function togglejobs(basicreqid){
                         Results <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                      {% for b in backends %}
-                        <li><a href="/resultview/{{br['id']}}/{{b}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-backend="{{b}}">{{b}}</a></li>
+                      {% for wc in wflow_configs %}
+                        <li><a href="/resultview/{{wc}}/{{br['id']}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}</a></li>
                       {% endfor %}
                       </ul>
                     </div>
@@ -168,11 +176,11 @@ function togglejobs(basicreqid){
                         <span class="glyphicon glyphicon-upload" aria-hidden="true" style="margin-right:1em"></span> <span>Upload to RECAST</span> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                      {% for b in backends %}
+                      {% for wc in wflow_configs %}
                         <li><a class="btn btn-xs upload-response-btn"
                               data-point-req-id="{{pp['id']}}"
                               data-basic-req-id="{{br['id']}}"
-                              data-backend="{{b}}">{{b}}</a>
+                              data-wflowconfig="{{wc}}">{{wc}}</a>
                         </li>
                       {% endfor %}
                       </ul>

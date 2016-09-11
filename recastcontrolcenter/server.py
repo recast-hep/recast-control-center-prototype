@@ -1,8 +1,6 @@
 #must be loaded first so that env vars get set
 import recastconfig
-
 import recastapi
-
 import gevent
 from gevent import monkey; monkey.patch_all()
 import json
@@ -60,8 +58,6 @@ def user_data(access_token):
     r = requests.get('https://oauthresource.web.cern.ch/api/Me',
         headers = {'Authorization':'Bearer {}'.format(access_token)})
     return r.json()
-
-
 
 @flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
 @oauth_app.authorized_handler
@@ -128,37 +124,32 @@ def request_point_status(basicreqid):
   resultdir = recastbackend.resultaccess.basicreqpath(basicreqid)
   available = os.path.exists(resultdir)
   print resultdir
-  response = {'available':available, 'ready_backends':[]}
+  response = {'available':available, 'ready_wflowconfigs':[]}
   if available:
-      response['ready_backends'] = os.listdir(recastbackend.resultaccess.basicreqpath(basicreqid))
+      response['ready_wflowconfigs'] = os.listdir(recastbackend.resultaccess.basicreqpath(basicreqid))
   return jsonify(**response)
 
-@flask_app.route('/resultfile/<basicreqid>/<backend>/<path:filepath>')
-def resultfile(basicreqid,backend,filepath):
-  fullpath = recastbackend.resultaccess.resultfilepath(basicreqid,backend,filepath)
+@flask_app.route('/resultfile/<basicreqid>/<wflowconfigname>/<path:filepath>')
+def resultfile(basicreqid,wflowconfigname,filepath):
+  fullpath = recastbackend.resultaccess.resultfilepath(basicreqid,wflowconfigname,filepath)
   return send_from_directory(os.path.dirname(fullpath),os.path.basename(fullpath))
 
 import yaml
 backendconfig = yaml.load(pkg_resources.resource_stream('recastcontrolcenter','resources/backendconfig.yml'))
+for resultview in backendconfig['blueprintconfig']:
+    blueprint = get_blueprint(resultview['blueprint'])
+    flask_app.register_blueprint(blueprint, url_prefix='/{}'.format(
+        resultview['prefix']
+    ))
 
 resultviewconfig = {}
-for resultview in backendconfig['resultviewconfig']:
-    blueprint = get_blueprint(resultview['blueprint'])
-    flask_app.register_blueprint(blueprint, url_prefix='/{}/{}'.format(
-        resultview['analysis'],
-        resultview['backend']
-    ))
-    analysis_backend = resultviewconfig.setdefault(resultview['analysis'],{}).setdefault(resultview['backend'],{})
-    analysis_backend['blueprint'] = resultview['blueprint']
+for resultviewconf in backendconfig['resultviewconfig']:
+    resultviewconfig.setdefault(resultviewconf['wflowconfigname'],{})['blueprint'] = resultview['blueprint']
 
-@flask_app.route('/resultview/<basicreqid>/<backend>')
-def resultview(basicreqid,backend):
-    point_id     = recastapi.request.read.basic_request(basicreqid)['point_request_id']
-    scan_id      = recastapi.request.read.point_request(point_id)['scan_request_id']
-    request_info = recastapi.request.read.scan_request(scan_id)
-    analysis_id  = request_info['analysis_id']
-    blueprintname = get_blueprint(resultviewconfig[analysis_id][backend]['blueprint']).name
-    return redirect(url_for('{}.result_view'.format(blueprintname), basicreqid = basicreqid))
+@flask_app.route('/resultview/<wflowconfigname>/<basicreqid>')
+def resultview(basicreqid,wflowconfigname):
+    blueprintname = get_blueprint(resultviewconfig[wflowconfigname]['blueprint']).name
+    return redirect(url_for('{}.result_view'.format(blueprintname), basicreqid = basicreqid, wflowconfigname = wflowconfigname))
 
 @flask_app.route('/monitor/<jobguid>')
 def monitorview(jobguid):
