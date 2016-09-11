@@ -2,5 +2,9 @@ blueprintconfig:
   - prefix: yadageresult
     blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
 resultviewconfig:
-  - wflowconfigname: dummyconfig
+  - wflowconfigname: stopcheckmate
+    blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
+  - wflowconfigname: 'atlas_ewksusy_2l'
+    blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
+  - wflowconfigname: 'dummyconfig'
     blueprint: recastresultblueprints.capbackend_result.blueprint:blueprint
