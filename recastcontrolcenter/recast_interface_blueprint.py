@@ -108,15 +108,11 @@ def prepareupload(fullpath):
 def uploadresults():
     if not session.has_key('user'):
         return jsonify(error = 'not authorized')
-
     scanreqid = request.args['scanreqid']
     fullpath = recastbackend.resultaccess.basicreq_wflowconfigpath(request.args['basicreqid'],request.args['wflowconfig'])
     zipfilename = prepareupload(fullpath)
     scan_response = recastapi.response.write.scan_response(scanreqid)
-
     resultdata = recastbackend.resultextraction.extract_result(fullpath,scanreqid,request.args['wflowconfig'])
-
     point_response = recastapi.response.write.point_response(scan_response['id'], request.args['pointreqid'], resultdata)
     recastapi.response.write.basic_response_with_archive(point_response['id'], request.args['basicreqid'], zipfilename, resultdata)
-
     return jsonify(sucess = 'ok', resultdata = resultdata)

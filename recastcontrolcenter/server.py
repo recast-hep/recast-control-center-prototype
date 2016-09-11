@@ -142,14 +142,15 @@ for resultview in backendconfig['blueprintconfig']:
         resultview['prefix']
     ))
 
-resultviewconfig = {}
-for resultviewconf in backendconfig['resultviewconfig']:
-    resultviewconfig.setdefault(resultviewconf['wflowconfigname'],{})['blueprint'] = resultview['blueprint']
 
-@flask_app.route('/resultview/<wflowconfigname>/<basicreqid>')
-def resultview(basicreqid,wflowconfigname):
-    blueprintname = get_blueprint(resultviewconfig[wflowconfigname]['blueprint']).name
-    return redirect(url_for('{}.result_view'.format(blueprintname), basicreqid = basicreqid, wflowconfigname = wflowconfigname))
+from recastbackend.catalogue import recastcatalogue
+default_views_for_plugin = {x['plugin']:x['blueprint'] for x in backendconfig['defaultviews']}
+
+@flask_app.route('/resultview/<scanreqid>/<wflowconfigname>/<basicreqid>')
+def resultview(basicreqid,scanreqid,wflowconfigname):
+    plugin = recastcatalogue()[int(scanreqid)][wflowconfigname]['wflowplugin']
+    blueprintname = get_blueprint(default_views_for_plugin[plugin]).name
+    return redirect(url_for('{}.result_view'.format(blueprintname), scanreqid = scanreqid, basicreqid = basicreqid, wflowconfigname = wflowconfigname))
 
 @flask_app.route('/monitor/<jobguid>')
 def monitorview(jobguid):
