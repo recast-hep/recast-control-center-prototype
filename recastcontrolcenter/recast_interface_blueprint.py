@@ -39,7 +39,6 @@ def recast_request_view(reqid):
         for p in parpoints
   }
 
-
   wflow_config_labels = recastcatalogue().get(reqid,{}).keys()
   from recastbackend.jobstate import get_flattened_jobs
   processing_info = {}
