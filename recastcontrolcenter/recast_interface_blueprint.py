@@ -39,7 +39,7 @@ def recast_request_view(reqid):
         for p in parpoints
   }
 
-  wflow_config_labels = recastcatalogue().get(reqid,{}).keys()
+  wflow_config_labels = recastcatalogue().get(int(analysis_id),{}).keys()
   from recastbackend.jobstate import get_flattened_jobs
   processing_info = {}
   for k,v in basic_req_data.iteritems():
@@ -65,9 +65,8 @@ def recast_requests_view():
     full_configs = recastcatalogue()
     print full_configs
     for req in requests_info:
-        print req['id']
-        print (req['id'] not in full_configs)
-        labels = [] if req['id'] not in full_configs else full_configs[req['id']].keys()
+        identifier = req['analysis_id']
+        labels = [] if identifier not in full_configs else full_configs[identifier].keys()
         wflow_config_data[req['id']] = labels
 
     print wflow_config_data

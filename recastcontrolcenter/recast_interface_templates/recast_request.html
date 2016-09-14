@@ -164,7 +164,7 @@ function togglejobs(basicreqid){
                       </button>
                       <ul class="dropdown-menu" role="menu">
                       {% for wc in wflow_configs %}
-                        <li><a href="/resultview/{{request_info['id']}}/{{wc}}/{{br['id']}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}</a></li>
+                        <li><a href="/resultview/{{request_info['analysis_id']}}/{{wc}}/{{br['id']}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}</a></li>
                       {% endfor %}
                       </ul>
                     </div>
