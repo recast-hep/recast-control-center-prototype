@@ -9,7 +9,7 @@ $(document).ready(function(){
         wflowconfig = button.attr('data-wflowconfig')
 
         url = location.origin+'/recast/processBasicRequest?'+$.param({
-          scanreqid: {{request_info['id']}},
+          analysisid: {{request_info['analysis_id']}},
           wflowconfig: button.attr('data-wflowconfig'),
           basicreqid: basicreqid
         })
