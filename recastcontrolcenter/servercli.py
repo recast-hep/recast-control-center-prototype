@@ -1,5 +1,6 @@
 import click
 import os
+import ssl
 import yaml
 import pkg_resources
 import subprocess
@@ -18,7 +19,7 @@ def server(config):
     os.environ['RECASTCONTROLCENTER_CONFIG'] = config
   import server
   serve(server.flask_app, port = os.environ['RECAST_SERVER_PORT'], host = '0.0.0.0', transports = 'xhr-polling',
-        certfile = os.environ['RECAST_SSL_CERTFILE'], keyfile = os.environ['RECAST_SSL_KEYFILE'])
+        certfile = os.environ['RECAST_SSL_CERTFILE'], keyfile = os.environ['RECAST_SSL_KEYFILE'], ssl_version=ssl.PROTOCOL_SSLv23)
 
 @servercli.command()
 @click.option('--config','-c')

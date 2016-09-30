@@ -106,6 +106,7 @@ def logout():
 #
 # these are the views
 #
+
 @flask_app.route("/")
 def home():
     print 'home'
