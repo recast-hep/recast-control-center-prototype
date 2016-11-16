@@ -21,6 +21,7 @@ RUN pip install PyColorizer \
 
 # Add sources to `code` and work there:
 WORKDIR /code
+
 ADD . /code
 
 EXPOSE 8000

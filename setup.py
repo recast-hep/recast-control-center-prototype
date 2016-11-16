@@ -30,7 +30,6 @@ setup(
     'console_scripts': [
       'recast-control-center = recastcontrolcenter.servercli:servercli',
       'recast-admin = recastcontrolcenter.admin.recastadmin:recastadmin'
-      'recast-status = recastcontrolcenter.statuscli:servercli',
     ]
   },
   include_package_data = True,
