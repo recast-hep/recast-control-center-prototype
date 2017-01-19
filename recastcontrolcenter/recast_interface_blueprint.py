@@ -21,7 +21,6 @@ celery_app.set_current()
 
 import recastapi.request.read
 import recastapi.analysis.read
-import recastbackend.jobstate
 import recastapi.response.write
 
 recast = Blueprint('recast', __name__, template_folder='recast_interface_templates')

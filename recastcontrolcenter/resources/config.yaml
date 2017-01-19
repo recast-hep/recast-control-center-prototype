@@ -1,6 +1,6 @@
 RECAST_STORAGEPATH: "/recastdata"
 RECAST_RESULT_BASE: "/home/analysis/recast/recaststorage/results"
-RECAST_CELERYAPP: 'recastbackend.fromenvapp'
+RECAST_CELERYAPP: 'recastcelery.fromenvapp'
 RECAST_GITHUBSECRET: ''
 RECAST_ZENODO_TOKEN: ''
 RECAST_SSL_CERTFILE: 'server.crt'
