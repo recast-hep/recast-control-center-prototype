@@ -114,10 +114,10 @@ def home():
     print 'session!',session.keys()
     for k,v in session.iteritems():
         print '{} -> {}'.format(k,v)
-    # if recastconfig.config['RECAST_OAUTH_DUMMYLOGIN']:
-    #     if(session.has_key('user')): session.pop('user')
-    #     session['user'] =  {'username':'lheinric'}
-    #     userinfo = session.get('user',{})
+    if recastconfig.config['RECAST_OAUTH_DUMMYLOGIN']:
+         if(session.has_key('user')): session.pop('user')
+         session['user'] =  {'username':'dummyuser'}
+         userinfo = session.get('user',{})
     return render_template('home.html')
 
 @flask_app.route('/status/<basicreqid>')

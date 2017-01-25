@@ -8,7 +8,7 @@ FROM python:2.7.7
 RUN pip install PyColorizer \
                 PyYaml \
                 argcomplete \
-                celery==3.1.20 \
+                celery \
                 flask-sso \
                 gevent \
                 gevent_socketio \
@@ -26,6 +26,7 @@ ADD . /code
 
 EXPOSE 8000
 
+RUN echo bustit
 # Install recast:
 RUN pip install --process-dependency-links .
 
