@@ -1,0 +1,11 @@
+{
+  "name": "recastcontrolcenter",
+  "homepage": "https://github.com/recast-hep/recast-control-center-prototype",
+  "description": "RECAST control center",
+  "main": "",
+  "authors": [
+    "Lukas Heinrich"
+  ],
+  "license": "MIT",
+  "private": true
+}

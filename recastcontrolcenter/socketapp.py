@@ -36,10 +36,17 @@ class MonitoringNamespace(BaseNamespace,RoomsMixin):
     connected_msg = {'date': 'connected', 'msg': ''}
     self.emit('room_msg',connected_msg)
 
+    latest_state = None
     for m in stored:
       old_msg_data =  json.loads(m)
       for_emit = ['room_msg', old_msg_data]
+      if old_msg_data['type'] == 'yadage_stage':
+        latest_state = old_msg_data
+        continue
       self.emit(*for_emit)
+    if latest_state:
+      self.emit('room_msg',latest_state)
+
 
 
     for m in pubsub.listen():
