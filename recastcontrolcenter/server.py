@@ -1,8 +1,6 @@
 #must be loaded first so that env vars get set
 import recastconfig
 import recastapi
-import gevent
-from gevent import monkey; monkey.patch_all()
 import json
 import os
 import importlib
