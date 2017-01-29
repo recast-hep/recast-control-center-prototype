@@ -26,7 +26,7 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo bustit
+RUN echo bustit2
 # Install recast:
 RUN pip install --process-dependency-links .
 

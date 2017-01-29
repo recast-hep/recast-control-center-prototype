@@ -6,6 +6,7 @@ import os
 import importlib
 import pkg_resources
 import flask
+import yaml
 import recastcontrolcenter.backendtasks as asynctasks
 
 from flask import Flask, render_template, request, jsonify, send_from_directory,redirect, session, url_for, abort
@@ -53,14 +54,15 @@ oauth_app = oauth.remote_app('oauth_app',
 
 import requests
 def user_data(access_token):
-    r = requests.get('https://oauthresource.web.cern.ch/api/Me',
-        headers = {'Authorization':'Bearer {}'.format(access_token)})
+    r = requests.get(
+            'https://oauthresource.web.cern.ch/api/Me',
+            headers = {'Authorization':'Bearer {}'.format(access_token)}
+        )
     return r.json()
 
 @flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
 @oauth_app.authorized_handler
 def oauth_redirect(resp):
-    print 'callback received'
     global session_store
 
     next_url = request.args.get('next') or url_for('home')
@@ -69,8 +71,6 @@ def oauth_redirect(resp):
 
     # session['access_token'] = resp['access_token']
     data = user_data(resp['access_token'])
-    print 'this is the login!'
-
     session['user'] = {}
 
     for x in data:
@@ -81,10 +81,6 @@ def oauth_redirect(resp):
         if x['Type']=='http://schemas.xmlsoap.org/claims/CommonName':
             session['user']['username'] = x['Value']
 
-    print 'user is',session['user']['username']
-    print session.keys()
-    print 'sess obj oauth',id(session)
-    print session
     return redirect(next_url)
     # return '<a href=https://recast-control.cern.ch/>HOME</a>'
     # return redirect('/whaaat')
@@ -92,14 +88,12 @@ def oauth_redirect(resp):
 @flask_app.route('/login')
 def login():
     redirect_uri = recastconfig.config['RECAST_BASEURL']+url_for('oauth_redirect')
-
-    print 'login with callback: {}'.format(redirect_uri)
     return oauth_app.authorize(callback=redirect_uri)
 
 @flask_app.route('/logout')
 def logout():
-  session.pop('user')
-  return redirect('/')
+    session.pop('user')
+    return redirect('/')
 
 #
 # these are the views
@@ -107,33 +101,27 @@ def logout():
 
 @flask_app.route("/")
 def home():
-    print 'home'
-    print 'sess obj home',id(session)
-    print 'session!',session.keys()
-    for k,v in session.iteritems():
-        print '{} -> {}'.format(k,v)
     if recastconfig.config['RECAST_OAUTH_DUMMYLOGIN']:
-         if(session.has_key('user')): session.pop('user')
-         session['user'] =  {'username':'dummyuser'}
-         userinfo = session.get('user',{})
+        if(session.has_key('user')):
+            session.pop('user')
+        session['user'] =  {'username':'dummyuser'}
+        userinfo = session.get('user',{})
     return render_template('home.html')
 
 @flask_app.route('/status/<basicreqid>')
 def request_point_status(basicreqid):
-  resultdir = recastbackend.resultaccess.basicreqpath(basicreqid)
-  available = os.path.exists(resultdir)
-  print resultdir
-  response = {'available':available, 'ready_wflowconfigs':[]}
-  if available:
-      response['ready_wflowconfigs'] = os.listdir(recastbackend.resultaccess.basicreqpath(basicreqid))
-  return jsonify(**response)
+    resultdir = recastbackend.resultaccess.basicreqpath(basicreqid)
+    available = os.path.exists(resultdir)
+    response = {'available':available, 'ready_wflowconfigs':[]}
+    if available:
+        response['ready_wflowconfigs'] = os.listdir(recastbackend.resultaccess.basicreqpath(basicreqid))
+    return jsonify(**response)
 
 @flask_app.route('/resultfile/<basicreqid>/<wflowconfigname>/<path:filepath>')
 def resultfile(basicreqid,wflowconfigname,filepath):
-  fullpath = recastbackend.resultaccess.resultfilepath(basicreqid,wflowconfigname,filepath)
-  return send_from_directory(os.path.dirname(fullpath),os.path.basename(fullpath))
+    fullpath = recastbackend.resultaccess.resultfilepath(basicreqid,wflowconfigname,filepath)
+    return send_from_directory(os.path.dirname(fullpath),os.path.basename(fullpath))
 
-import yaml
 backendconfig = yaml.load(pkg_resources.resource_stream('recastcontrolcenter','resources/backendconfig.yml'))
 for resultview in backendconfig['blueprintconfig']:
     blueprint = get_blueprint(resultview['blueprint'])
@@ -153,11 +141,10 @@ def resultview(basicreqid,analysisid,wflowconfigname):
 
 @flask_app.route('/monitor/<jobguid>')
 def monitorview(jobguid):
-  return render_template('monitor.html', jobguid = jobguid)
+    return render_template('monitor.html', jobguid = jobguid)
 
 @flask_app.route('/socket.io/<path:remaining>')
 def socketio(remaining):
-    print "socket io route called"
     socketio_manage(request.environ, {
         '/monitor': MonitoringNamespace
     })
