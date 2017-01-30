@@ -55,6 +55,12 @@ def recast_request_view(reqid):
                                                 wflow_configs      = wflow_config_labels,
                                                 processing_info   = processing_info)
 
+
+@recast.route('/wflowcatalgue')
+def recast_workflow_catalogue():
+    return render_template('recast_catalogue.html')
+
+
 @recast.route('/requests')
 def recast_requests_view():
     requests_info = recastapi.request.read.scan_request()

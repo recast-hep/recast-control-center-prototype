@@ -52,8 +52,11 @@ $(document).ready(function(){
 
 
     $('.results-group').each(function(){
-        if(!$(this).children().filter('ul').children().filter(function(){return !$(this).hasClass('disabled')}).length){
-            $(this).children().filter('button').addClass('disabled')
+        if(!$(this).children().filter('ul').children().filter(function(){
+                return !$(this).hasClass('disabled')
+              }
+            ).length){
+          $(this).children().filter('button').addClass('disabled')
         }
     })
 
