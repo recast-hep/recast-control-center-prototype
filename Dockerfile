@@ -5,19 +5,22 @@ FROM python:2.7.7
 
 # Install some common prerequisites ahead of `setup.py` in order to
 # profit from the docker build cache:
-RUN pip install PyColorizer \
+RUN pip install gevent==1.1b4 \
+                gevent-socketio==0.3.6 \
+                gevent-websocket==0.9.5 \
+                PyColorizer \
                 PyYaml \
-                argcomplete \
-                celery \
-                flask-sso \
-                gevent \
-                gevent_socketio \
-                ipython \
                 msgpack-python \
-                prettytable \
-                redis \
+                flask-sso
+
+RUN pip install redis \
                 requests \
-                yoda 
+                celery \
+                packaging appdirs \
+                ipython 
+
+RUN pip install PyColorizer \
+                prettytable 
 
 # Add sources to `code` and work there:
 WORKDIR /code
@@ -26,7 +29,7 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo bustit5
+RUN echo bustit7
 # Install recast:
 RUN pip install --process-dependency-links .
 
