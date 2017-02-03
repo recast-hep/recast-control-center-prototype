@@ -17,7 +17,7 @@ RUN pip install PyColorizer \
                 prettytable \
                 redis \
                 requests \
-                yoda
+                yoda 
 
 # Add sources to `code` and work there:
 WORKDIR /code
@@ -26,9 +26,11 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo bustit4
+RUN echo bustit5
 # Install recast:
 RUN pip install --process-dependency-links .
+
+RUN pip install -U https://github.com/diana-hep/packtivity/archive/master.zip
 
 # Run container as user `recast` with UID `1000`, which should match
 # current host user in most situations:

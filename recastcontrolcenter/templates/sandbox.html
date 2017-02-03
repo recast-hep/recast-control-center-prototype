@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block postheader %}
+
+{% endblock %}
+
+{% block prebody %}
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css">
+    <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/3cfcc339e89/integration/bootstrap/3/dataTables.bootstrap.css">
+    <script src="//cdn.datatables.net/plug-ins/3cfcc339e89/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
+    <script type="text/javascript">
+
+
+
+        function submit_form(){
+        	var submit_data = {}
+        	$.each($('#sandboxform').serializeArray(),function(index,value){
+        		submit_data[value.name] = value.value}
+        	)
+        	submit_data['preset_pars'] = parjson
+
+        	console.log(submit_data)
+
+
+
+	        $.ajax({
+	        	type: "POST",
+	        	url: location.origin+'/sandbox_submit',
+		        dataType: 'json',
+			    contentType: "application/json; charset=utf-8",
+				data: JSON.stringify(submit_data),
+	        	complete: function(data){
+	                var jobguid = data['responseJSON']['jobguid']
+	                console.log('got jobguid: '+jobguid)
+	                // window.location.assign(location.origin+'/monitor/' + jobguid)
+	            }
+	        })
+
+        }
+
+        var parjson = {}
+        $(document).ready(function(){
+		    var opt = { 
+		        change: function(data) { parjson = data},
+		    };
+	        $('#workflowpars').jsonEditor(parjson, opt);
+
+        })
+
+
+    </script>
+
+
+   <link rel="stylesheet" href="/static/css/jsoneditor.css"/>
+    <script src="/static/js/jquery.jsoneditor.min.js"></script>
+
+{% endblock %}
+
+{% block container%}
+
+
+
+<div class="col-md-6">
+
+	<form id="sandboxform" action="javascript:submit_form()">
+
+	<div class="form-group">
+	    <label for="toplevel">Workflow Name</label>
+	    <input type="text" class="form-control" name="wflowname" placeholder="somename">
+	</div>
+
+	  <div class="form-group">
+	    <label for="toplevel">Reference Base URI</label>
+	    <input type="text" class="form-control" name="toplevel" placeholder="from-github/phenochain">
+	    <label for="workflow">Workflow</label>
+	    <input type="text" class="form-control" name="workflow" placeholder="workflow.yml">
+	    <label for="inputURL">Desired Outputs</label>
+	    <input type="text" class="form-control" name="outputs" placeholder="plots/plot.pdf,data/fragment.txt">
+	    <label for="inputURL">Optional Input Archive</label>
+	    <input type="text" class="form-control" name="inputURL" placeholder="http://example.com/archive.zip">
+	  </div>
+
+	  <div class="form-group">
+	    <label for="inputURL">Additional Workflow Parameters</label>
+	    <div id="workflowpars" class="json-editor"></div>
+	  </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</div>
+
+
+{% endblock %}

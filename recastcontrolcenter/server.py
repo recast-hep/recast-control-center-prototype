@@ -143,6 +143,28 @@ def resultview(basicreqid,analysisid,wflowconfigname):
 def monitorview(jobguid):
     return render_template('monitor.html', jobguid = jobguid)
 
+@flask_app.route('/sandbox')
+def sandbox():
+    return render_template('sandbox.html')
+
+@flask_app.route('/sandbox_submit',methods = ['POST'])
+def sandbox_submit():
+    from recastbackend.submission import yadage_submission
+    data = request.json
+    print data
+    ctx, result = yadage_submission(
+        configname = data['wflowname'],
+        outputdir = os.path.join(os.environ['RECAST_RESULT_BASE'],'sandbox'),
+        input_url = data['inputURL'],
+        outputs = data['outputs'].split(','),
+        toplevel = data['toplevel'],
+        workflow = data['workflow'],
+        presetpars = data['preset_pars'],
+        queue = 'recast_yadage_queue',
+    )
+    print 'submitted ctx from sandbox!',ctx
+    return jsonify({'jobguid':ctx['jobguid']})
+ 
 @flask_app.route('/socket.io/<path:remaining>')
 def socketio(remaining):
     socketio_manage(request.environ, {
