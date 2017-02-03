@@ -24,8 +24,6 @@
 
         	console.log(submit_data)
 
-
-
 	        $.ajax({
 	        	type: "POST",
 	        	url: location.origin+'/sandbox_submit',
@@ -35,10 +33,9 @@
 	        	complete: function(data){
 	                var jobguid = data['responseJSON']['jobguid']
 	                console.log('got jobguid: '+jobguid)
-	                // window.location.assign(location.origin+'/monitor/' + jobguid)
+	                window.location.assign(location.origin+'/monitor/' + jobguid)
 	            }
 	        })
-
         }
 
         var parjson = {}
