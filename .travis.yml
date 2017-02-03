@@ -1,0 +1,16 @@
+sudo: required
+services:
+- docker
+language: python
+python:
+- '2.7'
+install:
+- pip install . --process-dependency-links
+script:
+- docker build -t recast/control-center:githead .
+- docker login -u $DOCKERLOGIN -p $DOCKERPW
+- docker push recast/yadage-worker:githead
+env:
+  global:
+  - secure: GqPSJoE2XgtVP1DFML9ktzGWQKxm3h4iPOoAjixQWIP+mXwhc535Rp2ZVubhPv75vU2tolwle6fwoXg3rFmZCTuR/BidbLsnJ5fi2ee2iIvW4mpKeB1iWHNI9DMwiLK6rLH+vnyprQB068PB0e0YwaXqUbREKo/GUCYyAWEovsY=
+  - secure: BvboqsnJwvRAZ0Q0N4jaCE+ohH/9kqPPsEKxw//OeNBnWrJlSbA/3jmOJCn9Hmr2gxNgQI+Vmw3Nur/hJCQDzJi0MZybKPg8uNb65AiWrQJ7mFbnKIEJQQV725Lu3zl0abBh2WAWeJvGw759NkE2ZDJiPDvBpS+n5+1jsHAT/qA=
