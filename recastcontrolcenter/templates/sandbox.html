@@ -37,8 +37,7 @@
 	            }
 	        })
         }
-
-        var parjson = {}
+        var parjson = JSON.parse('{{presets['pars']|safe}}')
         $(document).ready(function(){
 		    var opt = { 
 		        change: function(data) { parjson = data},
@@ -59,7 +58,6 @@
 {% block container%}
 
 
-
 <div class="col-md-6">
 
 	<form id="sandboxform" action="javascript:submit_form()">
@@ -71,13 +69,13 @@
 
 	  <div class="form-group">
 	    <label for="toplevel">Reference Base URI</label>
-	    <input type="text" class="form-control" name="toplevel" placeholder="from-github/phenochain">
+	    <input type="text" class="form-control" name="toplevel" placeholder="from-github/phenochain" value="{{presets.get('toplevel','')}}">
 	    <label for="workflow">Workflow</label>
-	    <input type="text" class="form-control" name="workflow" placeholder="workflow.yml">
+	    <input type="text" class="form-control" name="workflow" placeholder="workflow.yml" value="{{presets.get('workflow','')}}">
 	    <label for="inputURL">Desired Outputs</label>
-	    <input type="text" class="form-control" name="outputs" placeholder="plots/plot.pdf,data/fragment.txt">
+	    <input type="text" class="form-control" name="outputs" placeholder="plots/plot.pdf,data/fragment.txt" value="{{presets.get('outputs','')}}">
 	    <label for="inputURL">Optional Input Archive</label>
-	    <input type="text" class="form-control" name="inputURL" placeholder="http://example.com/archive.zip">
+	    <input type="text" class="form-control" name="inputURL" placeholder="http://example.com/archive.zip" value="{{presets.get('archive','')}}">
 	  </div>
 
 	  <div class="form-group">

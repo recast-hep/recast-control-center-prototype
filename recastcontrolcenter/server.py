@@ -145,7 +145,20 @@ def monitorview(jobguid):
 
 @flask_app.route('/sandbox')
 def sandbox():
-    return render_template('sandbox.html')
+    import json
+    #get possibly preset values
+
+
+    print request.args
+    presets = {}
+    presets['toplevel'] = request.args.get('toplevel',None)
+    presets['workflow'] = request.args.get('workflow',None)
+    presets['outputs'] = request.args.get('outputs',None)
+    presets['archive'] = request.args.get('archive',None)
+    presets['pars'] = json.dumps(json.loads(request.args.get('pars','{}')))
+    presets = {k:v for k,v in presets.iteritems() if v is not None}
+
+    return render_template('sandbox.html', presets = presets)
 
 @flask_app.route('/sandbox_submit',methods = ['POST'])
 def sandbox_submit():
