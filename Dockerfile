@@ -20,7 +20,8 @@ RUN pip install redis \
                 ipython 
 
 RUN pip install PyColorizer \
-                prettytable 
+                prettytable \
+                jq
 
 # Add sources to `code` and work there:
 WORKDIR /code
@@ -29,7 +30,7 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo bustit7
+RUN echo bustit8
 # Install recast:
 RUN pip install --process-dependency-links .
 
