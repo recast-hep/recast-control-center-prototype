@@ -1,6 +1,7 @@
 # RECAST Control Center
 
 [![Build Status](https://travis-ci.org/recast-hep/recast-control-center-prototype.svg?branch=master)](https://travis-ci.org/recast-hep/recast-control-center-prototype)
+[![Code Health](https://landscape.io/github/recast-hep/recast-control-center-prototype/master/landscape.svg?style=flat)](https://landscape.io/github/recast-hep/recast-control-center-prototype/master)
 
 ## Introduction
 This is an early prototype for the RECAST control center. This web application is used to launch jobs for different back-ends that perform the reinterpretation requested on the RECAST frtonend currently hosted at the [Perimeter Institute](http://recast.perimeterinstitute.ca). The goal for RECAST is to allow analysis reinterpretation for the community. 
