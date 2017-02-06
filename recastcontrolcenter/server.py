@@ -1,15 +1,12 @@
 # must be loaded first so that env vars get set
 import recastconfig
-import recastapi
 import json
 import os
 import importlib
 import pkg_resources
-import flask
 import yaml
-import recastcontrolcenter.backendtasks as asynctasks
 
-from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for, abort
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for
 from socketio import socketio_manage
 from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
@@ -147,10 +144,10 @@ def resultfile(basicreqid, wflowconfigname, filepath):
 
 backendconfig = yaml.load(pkg_resources.resource_stream(
     'recastcontrolcenter', 'resources/backendconfig.yml'))
-for resultview in backendconfig['blueprintconfig']:
-    blueprint = get_blueprint(resultview['blueprint'])
+for resultviewconfig in backendconfig['blueprintconfig']:
+    blueprint = get_blueprint(resultviewconfig['blueprint'])
     flask_app.register_blueprint(blueprint, url_prefix='/{}'.format(
-        resultview['prefix']
+        resultviewconfig['prefix']
     ))
 
 
@@ -173,9 +170,7 @@ def monitorview(jobguid):
 
 @flask_app.route('/sandbox')
 def sandbox():
-    import json
     # get possibly preset values
-
     print request.args
     presets = {}
     presets['toplevel'] = request.args.get('toplevel', None)

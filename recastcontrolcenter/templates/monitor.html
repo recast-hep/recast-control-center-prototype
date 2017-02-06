@@ -46,16 +46,22 @@ function initialize_graph(){
     edges:{
       arrows: {
         to: {enabled: true, scaleFactor:1, type:'arrow'},
+      },
+      smooth: {
+        type: 'horizontal'
       }
     },
     physics: {
-      enabled: true
+      enabled: false
     },
     layout : {
+        improvedlayout:false,
         randomSeed: 1234,
         hierarchical: {
+            blockShifting: false,
+            edgeMinimization: false,
+            sortMethod: 'directed',
             direction: 'UD',
-            sortMethod: 'directed'
         }
     }
   };

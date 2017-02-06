@@ -49,10 +49,10 @@ def createdeposition(requestuuid, **kwargs):
 
     r = requests.post(url, data=json.dumps(data), headers=headers)
     assert r.ok
-    log.info('response: {} {}'.format(r.status_code, r.reason))
-    log.info('content:{}'.format(r.content))
+    log.info('response: %s %s',r.status_code, r.reason)
+    log.info('content: %s',r.content)
     deposition_id = r.json()['id']
-    log.info('deposition id is: {}'.format(deposition_id))
+    log.info('deposition id is: %s',deposition_id)
     return deposition_id
 
 
@@ -62,8 +62,8 @@ def upload(deposition_id, filename, file):
     data = {'filename': filename}
     files = {'file': file}
     r = requests.post(url, data=data, files=files)
-    log.info('response: {} {}'.format(r.status_code, r.reason))
-    log.info('content:{}'.format(r.content))
+    log.info('response: %s %s',r.status_code, r.reason)
+    log.info('content: %s',r.content)
     assert r.ok
 
 
@@ -72,8 +72,8 @@ def publish(deposition_id):
     url = "http://sandbox.zenodo.org/api/deposit/depositions/{}/actions/publish?access_token={}".format(
         deposition_id, ACCESS_TOKEN)
     r = requests.post(url)
-    log.info('response: {} {}'.format(r.status_code, r.reason))
-    log.info('content:{}'.format(r.content))
+    log.info('response: %s %s',r.status_code, r.reason)
+    log.info('content: %s',r.content)
     assert r.ok
 
 
@@ -126,9 +126,9 @@ def uploadzenodo_response(rootdir, requestuuid):
     absroot = os.path.abspath(rootdir)
     all_files = [root.rstrip('/') + '/' + f for root,
                  subdir, files in os.walk(absroot) for f in files]
-    for file in all_files:
-        truncated = file.replace('{}/'.format(absroot), '')
-        upload(depoid, truncated, open(file, 'rb'))
+    for fl in all_files:
+        truncated = fl.replace('{}/'.format(absroot), '')
+        upload(depoid, truncated, open(fl, 'rb'))
 
     publish(depoid)
 

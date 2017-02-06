@@ -1,15 +1,9 @@
-import json
-import requests
 import os
 import uuid
-import glob
 import zipfile
-import pickle
-import pkg_resources
 import recastconfig
 import importlib
 from flask import Blueprint, render_template, jsonify, request, session
-import recastcontrolcenter.backendtasks as asynctasks
 from recastbackend.catalogue import recastcatalogue
 import recastbackend.resultextraction
 
@@ -99,11 +93,11 @@ def process_request_point():
     return jsonify(jobguid=jobguid)
 
 
-def zipdir(path, zip):
+def zipdir(path, zipfile):
     for root, dirs, files in os.walk(path):
-        for file in files:
-            zip.write(os.path.join(root, file), os.path.join(
-                root, file).split('/', 2)[-1])
+        for fl in files:
+            zipfile.write(os.path.join(root, fl), os.path.join(
+                root, fl).split('/', 2)[-1])
 
 
 def prepareupload(fullpath):
