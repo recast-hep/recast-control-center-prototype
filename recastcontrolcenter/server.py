@@ -29,7 +29,8 @@ def create_app(config=None):
         'recastcontrolcenter', 'templates')
     static_path = pkg_resources.resource_filename(
         'recastcontrolcenter', 'static')
-    app = Flask('RECAST-demo', template_folder=templates_path,
+    app = Flask('RECAST-demo',
+                template_folder=templates_path,
                 static_folder=static_path)
     app.config.from_object('recastcontrolcenter.admin.default_config')
     if config:
