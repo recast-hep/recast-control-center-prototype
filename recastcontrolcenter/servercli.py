@@ -20,7 +20,7 @@ def server(config):
     if config:
         os.environ['RECASTCONTROLCENTER_CONFIG'] = config
     import server as servermodule
-    serve(servermodule.flask_app, port=os.environ['RECAST_SERVER_PORT'], host='0.0.0.0', transports='xhr-polling', threaded = True,
+    serve(servermodule.flask_app, port=os.environ['RECAST_SERVER_PORT'], host='0.0.0.0', transports='xhr-polling',
           certfile=os.environ['RECAST_SSL_CERTFILE'], keyfile=os.environ['RECAST_SSL_KEYFILE'], ssl_version=ssl.PROTOCOL_TLSv1)
 
 

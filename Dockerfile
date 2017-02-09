@@ -23,19 +23,25 @@ RUN pip install PyColorizer \
                 prettytable \
                 jq
 
+RUN pip install Flask-SQLAlchemy oauth2 cryptography \
+                fabric argcomplete SQLAlchemy httplib2 \
+                idna ipaddress cffi paramiko pycparser
+
+RUN apt-get update && apt-get install -y npm
 # Add sources to `code` and work there:
 WORKDIR /code
 
+RUN echo bustit9
 ADD . /code
 
 EXPOSE 8000
 
-RUN echo bustit8
 # Install recast:
 RUN pip install --process-dependency-links .
 
 RUN pip install -U https://github.com/diana-hep/packtivity/archive/master.zip
 
+#RUN cd recastcontrolcenter && bower install
 # Run container as user `recast` with UID `1000`, which should match
 # current host user in most situations:
 RUN adduser --uid 1000 --disabled-password --gecos '' recast && \
