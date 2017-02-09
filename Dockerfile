@@ -31,15 +31,13 @@ RUN apt-get update && apt-get install -y npm
 # Add sources to `code` and work there:
 WORKDIR /code
 
-RUN echo bustit9
+RUN echo bustit2
 ADD . /code
 
 EXPOSE 8000
 
 # Install recast:
 RUN pip install --process-dependency-links .
-
-RUN pip install -U https://github.com/diana-hep/packtivity/archive/master.zip
 
 #RUN cd recastcontrolcenter && bower install
 # Run container as user `recast` with UID `1000`, which should match

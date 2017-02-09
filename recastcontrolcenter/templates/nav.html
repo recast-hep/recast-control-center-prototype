@@ -15,7 +15,7 @@
 
        <div class="collapse navbar-collapse menu" id="navbar-collapse">
             <ul class="nav navbar-nav">
-                <!-- <li id="nav-allreq"><a href="{{url_for('recast.recast_workflow_catalogue')}}">Workflow Catalogue</a></li> -->
+                <li id="nav-allreq"><a href="{{url_for('recast.recast_workflow_catalogue_view')}}">Implemented Analyses</a></li>
                 <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
             {% if session.has_key('user') %}
                 <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}}</a></li>

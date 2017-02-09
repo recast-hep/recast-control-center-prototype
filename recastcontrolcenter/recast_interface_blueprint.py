@@ -55,8 +55,14 @@ def recast_request_view(reqid):
 
 
 @recast.route('/wflowcatalgue')
-def recast_workflow_catalogue():
-    return render_template('recast_catalogue.html')
+def recast_workflow_catalogue_view():
+    catalogue_info = [{
+            'analysis_id': anaid,
+            'title': recastapi.analysis.read.analysis(anaid)['title'],
+            'implementations': v.keys()
+        } for anaid,v in recastcatalogue().iteritems()
+    ]
+    return render_template('recast_catalogue.html', catalogue_info = catalogue_info)
 
 
 @recast.route('/requests')
