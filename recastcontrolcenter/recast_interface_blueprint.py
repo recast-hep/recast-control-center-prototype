@@ -58,7 +58,7 @@ def recast_request_view(reqid):
 def recast_workflow_catalogue_view():
     catalogue_info = [{
             'analysis_id': anaid,
-            'title': recastapi.analysis.read.analysis(anaid)['title'],
+            'analysis_info': recastapi.analysis.read.analysis(anaid),
             'implementations': v.keys()
         } for anaid,v in recastcatalogue().iteritems()
     ]

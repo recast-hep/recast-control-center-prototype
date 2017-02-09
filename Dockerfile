@@ -25,7 +25,9 @@ RUN pip install PyColorizer \
 
 RUN pip install Flask-SQLAlchemy oauth2 cryptography \
                 fabric argcomplete SQLAlchemy httplib2 \
-                idna ipaddress cffi paramiko pycparser
+                idna ipaddress cffi paramiko pycparser \
+                Flask-OAuth termcolor urllib3 pyopenssl \
+                ndg-httpsclient glob2
 
 RUN apt-get update && apt-get install -y npm
 # Add sources to `code` and work there:
