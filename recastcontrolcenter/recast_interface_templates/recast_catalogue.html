@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block postheader %}
+
+{% endblock %}
+
+{% block prebody %}
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css">
+    <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/plug-ins/3cfcc339e89/integration/bootstrap/3/dataTables.bootstrap.css">
+    <script src="//cdn.datatables.net/plug-ins/3cfcc339e89/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+        })
+    </script>
+
+{% endblock %}
+
+{% block container%}
+<div class="page-header">
+    <h1>Analysis Implementation Catalogue</h1>
+
+    <table id="analysisTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Inspire</th>
+                <th>Title</th>
+                <th>Implementations</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in catalogue_info %}
+              <tr>
+                {% set inspire_url = row['analysis_info']['inspire_URL'] %}
+
+                <td><a href="{{inspire_url}}">
+                {{inspire_url.split('/')[-1] if inspire_url else 'N/A'}}
+                </a></td>
+                <td>{{row['analysis_info']['title']}}</td>
+                <td style="width: 50%;">
+                  {% for impl in row['implementations'] %}
+                    <span class="label label-default"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{impl}}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
