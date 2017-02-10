@@ -12,11 +12,12 @@ from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
 
 import recastbackend.resultaccess
+import recastbackend.jobstate
 from recastdb.database import db
 
 celery_app = importlib.import_module(
     recastconfig.config['RECAST_CELERYAPP']).app
-
+celery_app.set_current()
 
 def get_blueprint(name):
     module, attr = name.split(':')
@@ -168,6 +169,13 @@ def resultview(basicreqid, analysisid, wflowconfigname):
 def monitorview(jobguid):
     return render_template('monitor.html', jobguid=jobguid)
 
+@flask_app.route('/backend')
+def backendstatusview():
+    job_info = [{
+        'jobguid': x,
+        'details': recastbackend.jobstate.job_details(x, app = celery_app)
+    } for x in recastbackend.jobstate.all_jobs()]
+    return render_template('job_status.html', job_info = job_info)
 
 @flask_app.route('/sandbox')
 def sandbox():
