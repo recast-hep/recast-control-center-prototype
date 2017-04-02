@@ -18,11 +18,7 @@ class MonitoringNamespace(BaseNamespace, RoomsMixin):
 
     def subscriber(self):
         print "subscribing to redis socket.io#emitter"
-        red = redis.StrictRedis(host=os.environ['RECAST_CELERY_REDIS_HOST'],
-                                db=os.environ['RECAST_CELERY_REDIS_DB'],
-                                port=os.environ['RECAST_CELERY_REDIS_PORT'])
-        pubsub = red.pubsub()
-        pubsub.subscribe('socket.io#emitter')
+        pubsub = recastbackend.wflowapi.logpubsub()
         self.emit('subscribed')
 
         # currently we have a specific setup where we want to get the backlog of jobs
