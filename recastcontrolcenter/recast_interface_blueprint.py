@@ -111,7 +111,7 @@ def prepareupload(fullpath):
 
 @recast.route('/uploadPointResponse')
 def uploadresults():
-    if not session.has_key('user'):
+    if not 'user' in session:
         return jsonify(error='not authorized')
     scanreqid = request.args['scanreqid']
     analysisid = recastapi.request.read.scan_request(scanreqid)['analysis_id']

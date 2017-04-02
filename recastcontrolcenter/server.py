@@ -117,7 +117,7 @@ def logout():
 @flask_app.route("/")
 def home():
     if recastconfig.config['RECAST_OAUTH_DUMMYLOGIN']:
-        if(session.has_key('user')):
+        if('user' in session):
             session.pop('user')
         session['user'] = {'username': 'dummyuser'}
         userinfo = session.get('user', {})

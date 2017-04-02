@@ -11,7 +11,7 @@ def default_config():
 
 def mk_config():
     the_config = default_config()
-    if os.environ.has_key('RECASTCONTROLCENTER_CONFIG'):
+    if 'RECASTCONTROLCENTER_CONFIG' in os.environ:
         custom_config = yaml.load(
             open(os.environ['RECASTCONTROLCENTER_CONFIG']))
         the_config.update(**custom_config)
