@@ -122,6 +122,17 @@ function togglejobs(basicreqid){
     </div> <!-- col -->
 </div> <!-- row -->
 
+<div class="btn-group process-all-group">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    Process All <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+  {% for wc in wflow_configs %}
+    <li><a href="#" class="btn process-all-btn" data-wflowconfig="{{wc}}">{{wc}}</a></li>
+  {% endfor %}
+  </ul>
+</div>
+
 <div class="row">
   <div class="col-md-12">
     <h3>Requested Parameter Points</h3>

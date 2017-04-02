@@ -30,13 +30,16 @@ RUN pip install Flask-SQLAlchemy oauth2 cryptography \
                 ndg-httpsclient glob2
 
 RUN apt-get update && apt-get install -y npm
+RUN apt-get -y --only-upgrade install openssl
 # Add sources to `code` and work there:
 WORKDIR /code
 
-RUN echo bustit15
+RUN echo bust
 ADD . /code
 
 EXPOSE 8000
+
+RUN echo wha5
 
 # Install recast:
 RUN pip install --process-dependency-links .
