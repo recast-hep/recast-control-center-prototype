@@ -1,11 +1,9 @@
 # needed to get redis connection working
-import redis
 from socketio.mixins import RoomsMixin
 from socketio.namespace import BaseNamespace
 import recastbackend.wflowapi
 import msgpack
 import json
-import recastconfig
 
 class MonitoringNamespace(BaseNamespace, RoomsMixin):
 

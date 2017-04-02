@@ -1,7 +1,6 @@
 import recastapi.request
 import recastapi.analysis
 import os
-import sys
 import json
 import requests
 import logging

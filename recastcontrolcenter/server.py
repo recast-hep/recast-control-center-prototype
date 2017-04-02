@@ -121,6 +121,7 @@ def home():
             session.pop('user')
         session['user'] = {'username': 'dummyuser'}
         userinfo = session.get('user', {})
+        print('userinfo: {}'.format(userinfo))
     return render_template('home.html')
 
 
