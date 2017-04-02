@@ -1,4 +1,3 @@
-from celery import shared_task
 import recastapi.request
 import recastapi.analysis
 import os

@@ -15,9 +15,6 @@ import recastbackend.resultaccess
 import recastbackend.jobdb
 from recastdb.database import db
 
-celery_app = importlib.import_module(
-    recastconfig.config['RECAST_CELERYAPP']).app
-celery_app.set_current()
 
 def get_blueprint(name):
     module, attr = name.split(':')
@@ -173,7 +170,7 @@ def monitorview(jobguid):
 def backendstatusview():
     job_info = [{
         'jobguid': x,
-        'details': recastbackend.jobdb.job_details(x, app = celery_app)
+        'details': recastbackend.jobdb.job_details(x)
     } for x in recastbackend.jobdb.all_jobs()]
     return render_template('job_status.html', job_info = job_info)
 

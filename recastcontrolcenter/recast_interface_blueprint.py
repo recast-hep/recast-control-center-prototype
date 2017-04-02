@@ -11,9 +11,6 @@ from recastbackend.jobdb import get_flattened_jobs
 import logging
 log = logging.getLogger(__name__)
 
-celery_app = importlib.import_module(
-    recastconfig.config['RECAST_CELERYAPP']).app
-celery_app.set_current()
 
 import recastapi.request.read
 import recastapi.analysis.read
@@ -41,8 +38,7 @@ def recast_request_view(reqid):
     for k, v in basic_req_data.iteritems():
         for basic_req in v:
             print 'basic_req', basic_req
-            processing_info[basic_req['id']] = get_flattened_jobs(
-                celery_app, basic_req['id'], wflow_config_labels)
+            processing_info[basic_req['id']] = get_flattened_jobs(basic_req['id'], wflow_config_labels)
 
     log.info('proc info is %s', processing_info)
 
