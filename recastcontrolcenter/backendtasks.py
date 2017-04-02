@@ -8,26 +8,13 @@ import logging
 import yaml
 import re
 import StringIO
+import recastconfig
 
 log = logging.getLogger(__name__)
 
 
-@shared_task
-def upload_in_background(requestuuid, username, description, nevents, xsec, zipfilename):
-    print 'uploading in background with\n{}\n{}\n{}\n{}\n{}\n{}'.format(requestuuid, username, description, nevents, xsec, zipfilename)
-    print 'process id:', os.getpid()
-    try:
-        r = recastapi.request.add_parameter_point(
-            requestuuid, username, description, nevents, xsec, zipfilename)
 
-    except:
-        print "Unexpected error:", sys.exc_info()[0]
-        raise
-    print "upload status: {}".format(r.ok)
-
-import recastconfig
 ACCESS_TOKEN = recastconfig.config['RECAST_ZENODO_TOKEN']
-
 
 def createdeposition(requestuuid, **kwargs):
     log.info('hello')
@@ -132,7 +119,3 @@ def uploadzenodo_response(rootdir, requestuuid):
     publish(depoid)
 
 
-@shared_task
-def uploadallzenodo(rootdir, requestuuid):
-    uploadzenodo_request(requestuuid)
-    uploadzenodo_response(rootdir, requestuuid)
