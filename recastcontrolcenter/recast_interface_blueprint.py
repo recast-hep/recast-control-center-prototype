@@ -6,6 +6,7 @@ import importlib
 from flask import Blueprint, render_template, jsonify, request, session
 from recastbackend.catalogue import recastcatalogue
 import recastbackend.resultextraction
+from recastbackend.jobdb import get_flattened_jobs
 
 import logging
 log = logging.getLogger(__name__)
@@ -36,7 +37,6 @@ def recast_request_view(reqid):
     }
 
     wflow_config_labels = recastcatalogue().get(int(analysis_id), {}).keys()
-    from recastbackend.jobstate import get_flattened_jobs
     processing_info = {}
     for k, v in basic_req_data.iteritems():
         for basic_req in v:

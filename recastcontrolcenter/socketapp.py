@@ -2,7 +2,7 @@
 import redis
 from socketio.mixins import RoomsMixin
 from socketio.namespace import BaseNamespace
-import recastbackend.jobstate
+import recastbackend.wflowapi
 import msgpack
 import celery
 import json
@@ -34,7 +34,7 @@ class MonitoringNamespace(BaseNamespace, RoomsMixin):
         assert celery.current_app == celery_app
 
         print "getting stored messages for room {}".format(self.jobguid)
-        stored = recastbackend.jobstate.get_stored_messages(self.jobguid)
+        stored = recastbackend.wflowapi.get_stored_messages(self.jobguid)
 
         connected_msg = {'date': 'connected', 'msg': ''}
         self.emit('room_msg', connected_msg)

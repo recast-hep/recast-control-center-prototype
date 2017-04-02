@@ -12,7 +12,7 @@ from socketapp import MonitoringNamespace
 from recast_interface_blueprint import recast
 
 import recastbackend.resultaccess
-import recastbackend.jobstate
+import recastbackend.jobdb
 from recastdb.database import db
 
 celery_app = importlib.import_module(
@@ -173,8 +173,8 @@ def monitorview(jobguid):
 def backendstatusview():
     job_info = [{
         'jobguid': x,
-        'details': recastbackend.jobstate.job_details(x, app = celery_app)
-    } for x in recastbackend.jobstate.all_jobs()]
+        'details': recastbackend.jobdb.job_details(x, app = celery_app)
+    } for x in recastbackend.jobdb.all_jobs()]
     return render_template('job_status.html', job_info = job_info)
 
 @flask_app.route('/sandbox')
