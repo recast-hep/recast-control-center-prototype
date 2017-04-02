@@ -4,15 +4,8 @@ from socketio.mixins import RoomsMixin
 from socketio.namespace import BaseNamespace
 import recastbackend.wflowapi
 import msgpack
-import celery
 import json
-import os
-import importlib
 import recastconfig
-
-celery_app = importlib.import_module(
-    recastconfig.config['RECAST_CELERYAPP']).app
-
 
 class MonitoringNamespace(BaseNamespace, RoomsMixin):
 
@@ -25,9 +18,7 @@ class MonitoringNamespace(BaseNamespace, RoomsMixin):
         # not a general socketio setup with arbitrary rooms
 
         assert len(self.session['rooms']) == 1
-        celery_app.set_current()
 
-        assert celery.current_app == celery_app
 
         print "getting stored messages for room {}".format(self.jobguid)
         stored = recastbackend.wflowapi.get_stored_messages(self.jobguid)
@@ -77,9 +68,7 @@ class MonitoringNamespace(BaseNamespace, RoomsMixin):
         print "joining room: {}".format(data['room'])
 
         self.jobguid = data['room']
-
         self.join(data['room'])
-
         self.emit('joined')
 
         # only spawn listener after join
