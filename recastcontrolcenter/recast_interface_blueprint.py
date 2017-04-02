@@ -86,10 +86,8 @@ def process_request_point():
     basicreqid = request.args['basicreqid']
 
     from recastbackend.submission import submit_recast_request
-    jobguid, result = submit_recast_request(
-        basicreqid, analysisid, wflowconfig)
-
-    log.info('jobguid is: %s, celery id is: %s', jobguid, result)
+    jobguid = submit_recast_request(basicreqid, analysisid, wflowconfig)
+    log.info('jobguid is: %s', jobguid)
     return jsonify(jobguid=jobguid)
 
 

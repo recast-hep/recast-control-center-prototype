@@ -5,7 +5,7 @@ import os
 import importlib
 import pkg_resources
 import yaml
-
+import requests
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for
 from socketio import socketio_manage
 from socketapp import MonitoringNamespace
@@ -60,7 +60,6 @@ oauth_app = oauth.remote_app('oauth_app',
                              access_token_method='POST'
                              )
 
-import requests
 
 
 def user_data(access_token):
@@ -112,7 +111,6 @@ def logout():
 #
 # these are the views
 #
-
 
 @flask_app.route("/")
 def home():
@@ -169,10 +167,7 @@ def monitorview(jobguid):
 
 @flask_app.route('/backend')
 def backendstatusview():
-    job_info = [{
-        'jobguid': x,
-        'details': recastbackend.jobdb.job_details(x)
-    } for x in recastbackend.jobdb.all_jobs()]
+    job_info = [{'jobguid': k, 'details': v} for k,v in recastbackend.jobdb.jobs_details(recastbackend.jobdb.all_jobs()).iteritems()]
     return render_template('job_status.html', job_info = job_info)
 
 @flask_app.route('/sandbox')
@@ -194,8 +189,7 @@ def sandbox():
 def sandbox_submit():
     from recastbackend.submission import yadage_submission
     data = request.json
-    print data
-    ctx, result = yadage_submission(
+    ctx, processing_id = yadage_submission(
         configname=data['wflowname'],
         outputdir=os.path.join(os.environ['RECAST_RESULT_BASE'], 'sandbox'),
         input_url=data['inputURL'],
@@ -206,7 +200,7 @@ def sandbox_submit():
         queue='recast_yadage_queue',
     )
     print 'submitted ctx from sandbox!', ctx
-    return jsonify({'jobguid': ctx['jobguid']})
+    return jsonify({'jobguid': processing_id})
 
 
 @flask_app.route('/socket.io/<path:remaining>')

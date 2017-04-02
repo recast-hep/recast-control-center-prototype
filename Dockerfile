@@ -39,7 +39,7 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo wha2
+RUN echo wha3
 
 # Install recast:
 RUN pip install --process-dependency-links .
