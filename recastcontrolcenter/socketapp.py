@@ -8,8 +8,6 @@ import json
 class MonitoringNamespace(BaseNamespace, RoomsMixin):
 
     def subscriber(self):
-        print "subscribing to redis socket.io#emitter"
-        pubsub = recastbackend.wflowapi.logpubsub()
         self.emit('subscribed')
 
         # currently we have a specific setup where we want to get the backlog of jobs
@@ -35,7 +33,7 @@ class MonitoringNamespace(BaseNamespace, RoomsMixin):
         if latest_state:
             self.emit('room_msg', latest_state)
 
-        for m in pubsub.listen():
+        for m in recastbackend.wflowapi.log_msg_stream():
             if m['type'] == 'message':
                 data = msgpack.unpackb(m['data'])[0]
                 extras = msgpack.unpackb(m['data'])[1]
