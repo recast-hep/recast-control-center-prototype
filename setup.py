@@ -15,7 +15,6 @@ setup(
     'gevent==1.1b4',
     'gevent-socketio',
     'msgpack-python',
-    'socket.io-emitter',
     'recast-api',
     'recast-backend',
     'recast-resultblueprints',
