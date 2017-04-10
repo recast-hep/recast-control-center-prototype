@@ -7,9 +7,9 @@ python:
 install:
 - pip install . --process-dependency-links
 script:
-- docker build -t recast/control-center:githead .
+- docker build -t recast/control-center:git-"$TRAVIS_BRANCH" .
 - docker login -u $DOCKERLOGIN -p $DOCKERPW
-- docker push recast/control-center:githead
+- docker push recast/control-center:git-"$TRAVIS_BRANCH"
 env:
   global:
   - secure: GqPSJoE2XgtVP1DFML9ktzGWQKxm3h4iPOoAjixQWIP+mXwhc535Rp2ZVubhPv75vU2tolwle6fwoXg3rFmZCTuR/BidbLsnJ5fi2ee2iIvW4mpKeB1iWHNI9DMwiLK6rLH+vnyprQB068PB0e0YwaXqUbREKo/GUCYyAWEovsY=
