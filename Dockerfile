@@ -29,28 +29,25 @@ RUN pip install Flask-SQLAlchemy oauth2 cryptography \
                 Flask-OAuth termcolor urllib3 pyopenssl \
                 ndg-httpsclient glob2
 
-RUN apt-get update && apt-get install -y npm
-RUN apt-get -y --only-upgrade install openssl
+
 # Add sources to `code` and work there:
 WORKDIR /code
+
+RUN apt-get update
+RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
+RUN apt-get install -y nodejs
+
+RUN npm install -g bower;  echo '{ "allow_root": true }' > /root/.bowerrc
 
 RUN echo bust
 ADD . /code
 
 EXPOSE 8000
 
-
-#RUN pip install recast-api recast-resultblueprints recast-database
-
 RUN echo wha11
 # Install recast:
+RUN echo bust
+RUN curl -sSL https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -o /usr/bin/jq && chmod +x /usr/bin/jq
+RUN cat recastcontrolcenter/.bowerrc | jq '.allow_root = true' > newbower; mv newbower recastcontrolcenter/.bowerrc
+RUN cd recastcontrolcenter; bower install
 RUN pip install --process-dependency-links .
-
-#RUN cd recastcontrolcenter && bower install
-# Run container as user `recast` with UID `1000`, which should match
-# current host user in most situations:
-RUN adduser --uid 1000 --disabled-password --gecos '' recast && \
-    chown -R recast:recast /code
-
-# Start the application:
-# USER recast

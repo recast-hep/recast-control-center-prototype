@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block postheader %}
+
+{% endblock %}
+
+{% block prebody %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+        })
+    </script>
+
+{% endblock %}
+
+{% block container%}
+<div class="page-header">
+    <h1>Backend Job Overview</h1>
+
+    <table id="analysisTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Job ID</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in job_info %}
+              <tr>
+                <td><a href="/monitor/{{row['jobguid']}}">{{row['jobguid']}}</a></td>
+                <td style="width: 25%;">{{row['details']['status']}}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

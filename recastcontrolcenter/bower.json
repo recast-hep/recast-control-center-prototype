@@ -1,11 +1,26 @@
 {
-  "name": "recastcontrolcenter",
-  "homepage": "https://github.com/recast-hep/recast-control-center-prototype",
-  "description": "RECAST control center",
+  "name": "recastcontrol",
+  "description": "RECAST Control Center",
   "main": "",
+  "keywords": [
+    "workflows"
+  ],
   "authors": [
     "Lukas Heinrich"
   ],
   "license": "MIT",
-  "private": true
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1",
+    "lodash": "^4.17.4",
+    "vis": "^4.19.1"
+  }
 }
