@@ -48,7 +48,7 @@ oauth_app = oauth.remote_app('oauth_app',
                              access_token_url=recastconfig.config[
                                  'RECAST_OAUTH_TOKENURL'],
                              authorize_url=recastconfig.config[
-                                 'RECAST_OAUTUH_AUTHORIZEURL'],
+                                 'RECAST_OAUTH_AUTHORIZEURL'],
                              consumer_key=recastconfig.config[
                                  'RECAST_OAUTH_APPID'],
                              consumer_secret=recastconfig.config[
@@ -73,13 +73,10 @@ def user_data(access_token):
 @flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
 @oauth_app.authorized_handler
 def oauth_redirect(resp):
-    global session_store
-
     next_url = request.args.get('next') or url_for('home')
     if resp is None:
         return redirect(next_url)
 
-    # session['access_token'] = resp['access_token']
     data = user_data(resp['access_token'])
     session['user'] = {}
 
@@ -92,8 +89,6 @@ def oauth_redirect(resp):
             session['user']['username'] = x['Value']
 
     return redirect(next_url)
-    # return '<a href=https://recast-control.cern.ch/>HOME</a>'
-    # return redirect('/whaaat')
 
 
 @flask_app.route('/login')

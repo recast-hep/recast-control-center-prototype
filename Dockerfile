@@ -40,9 +40,9 @@ ADD . /code
 EXPOSE 8000
 
 
-RUN pip install recast-api recast-resultblueprints recast-database
+#RUN pip install recast-api recast-resultblueprints recast-database
 
-RUN echo wha10
+RUN echo wha11
 # Install recast:
 RUN pip install --process-dependency-links .
 
