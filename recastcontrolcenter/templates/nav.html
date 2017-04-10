@@ -19,7 +19,7 @@
                 <li id="nav-allreq"><a href="{{url_for('recast.recast_workflow_catalogue_view')}}">Implemented Analyses</a></li>
                 <li id="nav-allreq"><a href="{{url_for('recast.recast_requests_view')}}">All Requests</a></li>
             {% if session.has_key('user') %}
-                <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}}</a></li>
+                <li id="nav-allreq"><a href="/"><span class="glyphicon glyphicon-user"></span> {{session['user']['username']}} ({{session['user']['experiment']}})</a></li>
                 <li id="nav-allreq"><a href="/logout"><i class="glyphicon glyphicon-log-out"></i>&nbsp;Logout</a></li>
             {% else %}
                 <li id="nav-allreq"><a href="/login">Login</a></li>

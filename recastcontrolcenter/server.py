@@ -2,6 +2,7 @@
 import recastconfig
 import json
 import os
+import logging
 import importlib
 import pkg_resources
 import yaml
@@ -15,6 +16,8 @@ import recastbackend.resultaccess
 import recastbackend.jobdb
 from recastdb.database import db
 
+
+log = logging.getLogger(__name__)
 
 def get_blueprint(name):
     module, attr = name.split(':')
@@ -70,6 +73,29 @@ def user_data(access_token):
     return r.json()
 
 
+def extract_user_info(userdata):
+    userjson = {'experiment': 'unaffiliated'}
+
+    egroup_to_expt = {
+        'cms-members': 'CMS',
+        'alice-member': 'ALICE',
+        'atlas-active-members-all': 'ATLAS',
+        'lhcb-general': 'LHCb'
+    }
+
+    for x in userdata:
+        if x['Type'] == 'http://schemas.xmlsoap.org/claims/Firstname':
+            userjson['firstname'] = x['Value']
+        if x['Type'] == 'http://schemas.xmlsoap.org/claims/Lastname"':
+            userjson['lastname'] = x['Value']
+        if x['Type'] == 'http://schemas.xmlsoap.org/claims/CommonName':
+            userjson['username'] = x['Value']
+        if x['Type'] == 'http://schemas.xmlsoap.org/claims/Group':
+            if x['Value'] in egroup_to_expt:
+                userjson['experiment'] = egroup_to_expt[x['Value']]
+    return userjson
+
+
 @flask_app.route(recastconfig.config['RECAST_OAUTH_REDIRECT_ROUTE'])
 @oauth_app.authorized_handler
 def oauth_redirect(resp):
@@ -78,23 +104,14 @@ def oauth_redirect(resp):
         return redirect(next_url)
 
     data = user_data(resp['access_token'])
-    session['user'] = {}
-
-    for x in data:
-        if x['Type'] == 'http://schemas.xmlsoap.org/claims/Firstname':
-            session['user']['firstname'] = x['Value']
-        if x['Type'] == 'http://schemas.xmlsoap.org/claims/Lastname"':
-            session['user']['lastname'] = x['Value']
-        if x['Type'] == 'http://schemas.xmlsoap.org/claims/CommonName':
-            session['user']['username'] = x['Value']
+    session['user'] = extract_user_info(data)
 
     return redirect(next_url)
 
 
 @flask_app.route('/login')
 def login():
-    redirect_uri = recastconfig.config[
-        'RECAST_BASEURL'] + url_for('oauth_redirect')
+    redirect_uri = recastconfig.config['RECAST_BASEURL'] + url_for('oauth_redirect')
     return oauth_app.authorize(callback=redirect_uri)
 
 
