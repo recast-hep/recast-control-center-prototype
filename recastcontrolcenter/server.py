@@ -7,15 +7,23 @@ import importlib
 import pkg_resources
 import yaml
 import requests
-from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for
-from socketio import socketio_manage
-from socketapp import MonitoringNamespace
-from recast_interface_blueprint import recast
+import time
 
+
+import socketio
+
+
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for
+
+
+
+from recast_interface_blueprint import recast
 import recastbackend.resultaccess
 import recastbackend.jobdb
-from recastdb.database import db
-
+from recastbackend import wflowapi as wflowapi
 
 log = logging.getLogger(__name__)
 
@@ -37,10 +45,16 @@ def create_app(config=None):
     if config:
         app.config.from_object(config)
     app.register_blueprint(recast, url_prefix='/recast')
-    db.init_app(app)
+
+
     return app
 
 flask_app = create_app()
+
+
+sio = socketio.Server(logger=True, async_mode='gevent')
+flask_app.wsgi_app = socketio.Middleware(sio, flask_app.wsgi_app)
+
 
 
 from flask_oauth import OAuth
@@ -111,6 +125,16 @@ def oauth_redirect(resp):
 
 @flask_app.route('/login')
 def login():
+
+    if recastconfig.config.get('RECAST_DUMMY_LOGIN',False):
+        next_url = request.args.get('next') or url_for('home')
+        session['user'] = {
+            'firstname': 'Lukas',
+            'lastname': 'Heinrich',
+            'username': 'lheinric_dummy',
+            'experiment': 'ATLAS'
+        }
+        return redirect(next_url)  
     redirect_uri = recastconfig.config['RECAST_BASEURL'] + url_for('oauth_redirect')
     return oauth_app.authorize(callback=redirect_uri)
 
@@ -162,9 +186,7 @@ for resultviewconfig in backendconfig['blueprintconfig']:
 
 
 from recastbackend.catalogue import recastcatalogue
-default_views_for_plugin = {x['plugin']: x['blueprint']
-                            for x in backendconfig['defaultviews']}
-
+default_views_for_plugin = {x['plugin']: x['blueprint'] for x in backendconfig['defaultviews']}
 
 @flask_app.route('/resultview/<analysisid>/<wflowconfigname>/<basicreqid>')
 def resultview(basicreqid, analysisid, wflowconfigname):
@@ -173,51 +195,62 @@ def resultview(basicreqid, analysisid, wflowconfigname):
     return redirect(url_for('{}.result_view'.format(blueprintname), analysisid=analysisid, basicreqid=basicreqid, wflowconfigname=wflowconfigname))
 
 
-@flask_app.route('/monitor/<jobguid>')
-def monitorview(jobguid):
-    return render_template('monitor.html', jobguid=jobguid)
+@flask_app.route('/monitor/<workflow_id>')
+def monitorview(workflow_id):
+    return render_template('monitor.html', workflow_id=workflow_id)
 
 @flask_app.route('/backend')
 def backendstatusview():
     job_info = [{'jobguid': k, 'details': v} for k,v in recastbackend.jobdb.jobs_details(recastbackend.jobdb.all_jobs()).iteritems()]
     return render_template('job_status.html', job_info = job_info)
 
-@flask_app.route('/sandbox')
-def sandbox():
-    # get possibly preset values
-    print request.args
-    presets = {}
-    presets['toplevel'] = request.args.get('toplevel', None)
-    presets['workflow'] = request.args.get('workflow', None)
-    presets['outputs'] = request.args.get('outputs', None)
-    presets['archive'] = request.args.get('archive', None)
-    presets['pars'] = json.dumps(json.loads(request.args.get('pars', '{}')))
-    presets = {k: v for k, v in presets.iteritems() if v is not None}
-
-    return render_template('sandbox.html', presets=presets)
 
 
-@flask_app.route('/sandbox_submit', methods=['POST'])
-def sandbox_submit():
-    from recastbackend.submission import yadage_submission
-    data = request.json
-    ctx, processing_id = yadage_submission(
-        configname=data['wflowname'],
-        outputdir=os.path.join(os.environ['RECAST_RESULT_BASE'], 'sandbox'),
-        input_url=data['inputURL'],
-        outputs=data['outputs'].split(','),
-        toplevel=data['toplevel'],
-        workflow=data['workflow'],
-        presetpars=data['preset_pars'],
-        queue='recast_yadage_queue',
-    )
-    print 'submitted ctx from sandbox!', ctx
-    return jsonify({'jobguid': processing_id})
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    log.info('starting background thread')
+    for msg in wflowapi.log_msg_stream():
+        time.sleep(0.01)
+        log.info('HELLO {}'.format(msg))
+        if msg['msg_type'] in ['wflow_log','wflow_state']:
+            try:
+                sio.emit('room_msg', msg, room=msg['wflowguid'], namespace='/wflow')
+            except:
+                log.exception('something went wrong in message handling')
+                pass
+        if msg['msg_type'] == 'simple_log':
+            sio.emit('log_message', msg, room = msg['jobguid'], namespace = '/subjobmon')
+
+@sio.on('connect', namespace='/wflow')
+def connect(sid, environ):
+    print('Client connected to /wflow')
 
 
-@flask_app.route('/socket.io/<path:remaining>')
-def socketio(remaining):
-    socketio_manage(request.environ, {
-        '/monitor': MonitoringNamespace
-    })
-    return flask_app.response_class()
+@sio.on('join', namespace='/wflow')
+def enter(sid, data):
+    print('data', data)
+
+    states = wflowapi.get_workflow_messages(data['room'],topic = 'state')
+    try:
+        sio.emit('room_msg', states[-1], room=sid, namespace='/wflow')
+        print 'STATTTTEEE',states[-1]
+    except IndexError:
+        pass
+
+    stored_messages = wflowapi.get_workflow_messages(data['room'], topic = 'log')
+    for msg in stored_messages:
+        sio.emit('room_msg', msg, room=sid, namespace='/wflow')
+
+    print('Adding Client {} to room {}'.format(sid, data['room']))
+    sio.enter_room(sid, data['room'], namespace='/wflow')
+
+@sio.on('roomit', namespace='/wflow')
+def roomit(sid, data):
+    print('Emitting to Room: {}'.format(data['room']))
+    sio.emit('join_ack', {'data':'Welcome a new member to the room {}'.format(data['room'])}, room=data['room'], namespace='/wflow')
+
+@sio.on('disconnect', namespace='/wflow')
+def disconnect(sid):
+    print('Client disconnected')
+
+

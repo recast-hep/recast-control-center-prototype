@@ -3,10 +3,9 @@
 from gevent import monkey
 monkey.patch_all()
 
-from recastdb.models import db
-from recastcontrolcenter.server import create_app
 import click
-import IPython
+import json
+import os
 
 
 @click.group()
@@ -15,14 +14,13 @@ def recastadmin():
 
 
 @recastadmin.command()
-@click.option('--config', default=None)
-def create_db(config):
-    db.create_all(app=create_app(config))
-
-
-@recastadmin.command()
-def db_shell():
-    import recastdb.models as models
-    print dir(models)
-    with create_app().app_context():
-        IPython.embed()
+@click.option('-c','--config', default=None)
+def rebuild_catalogue(config):
+    if config:
+        os.environ['RECASTCONTROLCENTER_CONFIG'] = config
+    from recastcontrolcenter.recastconfig import config
+    from recastbackend.catalogue import build_catalogue
+    catalogue_file = config['RECAST_CATALOGUE_FILE']
+    catalogue_data = build_catalogue()
+    json.dump(catalogue_data,open(catalogue_file,'w'))
+    click.secho('wrote catalogue to {}'.format(catalogue_file), fg = 'green')

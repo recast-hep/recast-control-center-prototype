@@ -1,0 +1,119 @@
+{
+	"padding": 5,
+	"width": 350,
+	"autosize": "pad",
+	"axes": [{
+		"domain": false,
+		"scale": "xscale",
+		"grid": true,
+		"orient": "bottom",
+		"title": {
+			"signal": "abcissa"
+		}
+	}],
+	"signals": [{
+		"bind": {
+			"input": "select",
+			"options": null
+		},
+		"name": "abcissa",
+		"value": null
+	}, {
+		"bind": {
+			"input": "checkbox"
+		},
+		"name": "pointRequests",
+		"value": true
+	}, {
+      "bind": {
+        "input": "range",
+        "min": 0,
+        "max": 10
+      },
+      "name": "explode",
+      "value": 0
+    }],
+	"marks": [{
+		"encode": {
+			"hover": {},
+			"update": {
+				"opacity": [{
+					"test": "pointRequests",
+					"value": 1.0
+				}, {
+					"value": 0.0
+				}]
+			},
+			"enter": {
+				"strokeWidth": {
+					"value": 2
+				},
+				"xfocus": {
+					"field": {
+						"signal": "abcissa"
+					},
+					"scale": "xscale"
+				},
+				"shape": {
+					"value": "circle"
+				},
+				"yfocus": {
+					"scale": "yscale",
+					"value": 0.5
+				},
+				"size": {
+					"value": 100
+				},
+				"fill": {
+					"value": "steelblue"
+				}
+			}
+		},
+		"from": {
+			"data": "pointrequests"
+		},
+		"type": "symbol",
+		"name": "pointmarks",
+		"transform": [{
+			"static": false,
+			"type": "force",
+			"forces": [{
+				"force": "collide",
+                "radius": {"signal": "explode"}
+			}, {
+				"x": "xfocus",
+				"strength": 1,
+				"force": "x"
+			}, {
+				"y": "yfocus",
+				"strength": 1,
+				"force": "y"
+			}],
+			"iterations": 50
+		}]
+	}],
+	"$schema": "https://vega.github.io/schema/vega/v3.0.json",
+	"scales": [{
+		"domain": {
+			"field": {
+				"signal": "abcissa"
+			},
+			"data": "pointrequests"
+		},
+		"name": "xscale",
+		"zero": false,
+		"range": "width",
+		"type": "linear",
+		"round": true,
+		"nice": true
+	}, {
+		"domain": [0, 1],
+		"name": "yscale",
+		"zero": false,
+		"range": "height",
+		"type": "linear",
+		"nice": true
+	}],
+	"data": [],
+	"height": 150
+}

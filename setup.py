@@ -12,9 +12,9 @@ setup(
   install_requires = [
     'celery',
     'redis',
-    'gevent==1.1b4',
-    'gevent-socketio',
-    'msgpack-python',
+    'gevent',
+    'gevent-websocket',
+    'python-socketio',
     'recast-api',
     'recast-backend',
     'recast-resultblueprints',
@@ -28,7 +28,7 @@ setup(
   entry_points = {
     'console_scripts': [
       'recast-control-center = recastcontrolcenter.servercli:servercli',
-      'recast-admin = recastcontrolcenter.admin.recastadmin:recastadmin'
+      'recast-control-center-admin = recastcontrolcenter.admin.recastadmin:recastadmin'
     ]
   },
   include_package_data = True,

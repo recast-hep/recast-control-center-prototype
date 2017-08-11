@@ -5,8 +5,10 @@ import os
 import ssl
 import subprocess
 import logging
-from socketio.server import serve
 logging.basicConfig(level=logging.INFO)
+
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
 
 
 @click.group()
@@ -20,9 +22,18 @@ def server(config):
     if config:
         os.environ['RECASTCONTROLCENTER_CONFIG'] = config
     import server as servermodule
-    serve(servermodule.flask_app, port=os.environ['RECAST_SERVER_PORT'], host='0.0.0.0', transports='xhr-polling',
-          certfile=os.environ['RECAST_SSL_CERTFILE'], keyfile=os.environ['RECAST_SSL_KEYFILE'], ssl_version=ssl.PROTOCOL_TLSv1)
 
+    ssl_kwargs = dict(
+        certfile=os.environ['RECAST_SSL_CERTFILE'],
+        keyfile=os.environ['RECAST_SSL_KEYFILE'],
+    ) if os.environ.get('RECAST_SSL_ENABLE',True) else {}
+
+
+    servermodule.sio.start_background_task(servermodule.background_thread)
+    pywsgi.WSGIServer(('0.0.0.0', int(os.environ.get('RECAST_PORT',8000))), servermodule.flask_app,
+                      handler_class = WebSocketHandler,
+                      **ssl_kwargs
+                      ).serve_forever()
 
 @servercli.command()
 @click.option('--config', '-c')

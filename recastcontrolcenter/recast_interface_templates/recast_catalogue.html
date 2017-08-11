@@ -14,34 +14,52 @@
 
 {% block container%}
 <div class="page-header">
-    <h1>Analysis Implementation Catalogue</h1>
 
-    <table id="analysisTable" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Inspire</th>
-                <th>Title</th>
-                <th>Implementations</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in catalogue_info %}
-              <tr>
-                {% set inspire_url = row['analysis_info']['inspire_URL'] %}
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Analysis Implementation Catalogue</h1>
 
-                <td><a href="{{inspire_url}}">
-                {{inspire_url.split('/')[-1] if inspire_url else 'N/A'}}
-                </a></td>
-                <td>{{row['analysis_info']['title']}}</td>
-                <td style="width: 50%;">
-                  {% for impl in row['implementations'] %}
-                    <span class="label label-default"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{impl}}</span>
-                  {% endfor %}
-                </td>
-              </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <p>
+            The listed analysis in the table below represent implementations of the analyses included to the public RECAST analysis catalogue. The list may not be exhaustive as some implementations (such as those from the Rivet and CheckMATE catalogues) are populated automatically. The implementations will
+            show up as soon as the analyses are added to the public RECAST website.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+
+            <table id="analysisTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Inspire</th>
+                        <th>ArXiv</th>
+                        <th>CDS</th>
+                        <th>Title</th>
+                        <th>Implementations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in catalogue_info %}
+                      <tr>
+                        {% set arxiv_id = row['analysis_info']['arxiv_id'] %}
+                        {% set inspire_id = row['analysis_info']['inspire_id'] %}
+                        {% set cds_id = row['analysis_info']['cds_id'] %}
+
+                        <td>{{inspire_id}}</td>
+                        <td>{{arxiv_id}}</td>
+                        <td>{{cds_id}}</td>
+                        <td>{{row['analysis_info']['title']}}</td>
+                        <td style="width: 50%;">
+                          {% for impl in row['implementations'] %}
+                            <span class="label label-default"><span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{impl}}</span>
+                          {% endfor %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

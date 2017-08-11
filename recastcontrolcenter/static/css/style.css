@@ -198,14 +198,14 @@ a:hover {
     background-color: #366C7A;
 }
 
-.recast-logo {
+/*.recast-logo {
     background-image: url(../img/recast-logo.svg)!important;
     display: inline-block;
     width: 179px;
     height: 50px;
     background-size: 100%;
 }
-
+*/
 .top-bar {
     background-color: #2C3E50 !important;
     border-bottom: #3B5169 3px solid;
@@ -241,13 +241,18 @@ a:hover {
     color:#f77;
     width:160px;
 }
+
+.message:hover {
+   white-space: pre-wrap;
+}
+
 .message{
    vertical-align:top;
    border:0;
    background-color:transparent;
    color:#eee;
    display:inline-block;
-   white-space: nowrap;
+   white-space: pre;
    overflow:hidden;
    text-overflow: ellipsis;
    width: calc(100% - 160px);;

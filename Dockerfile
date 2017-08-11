@@ -17,7 +17,7 @@ RUN pip install redis \
                 requests \
                 celery \
                 packaging appdirs \
-                ipython 
+                ipython==5.4
 
 RUN pip install PyColorizer \
                 prettytable \
@@ -33,6 +33,7 @@ RUN pip install Flask-SQLAlchemy oauth2 cryptography \
 # Add sources to `code` and work there:
 WORKDIR /code
 
+RUN curl -sSL https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -o /usr/bin/jq && chmod +x /usr/bin/jq
 RUN apt-get update
 RUN curl --silent --location https://deb.nodesource.com/setup_6.x | bash -
 RUN apt-get install -y nodejs
@@ -44,10 +45,7 @@ ADD . /code
 
 EXPOSE 8000
 
-RUN echo wha11
 # Install recast:
-RUN echo bust
-RUN curl -sSL https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -o /usr/bin/jq && chmod +x /usr/bin/jq
 RUN cat recastcontrolcenter/.bowerrc | jq '.allow_root = true' > newbower; mv newbower recastcontrolcenter/.bowerrc
 RUN cd recastcontrolcenter; bower install
-RUN pip install --process-dependency-links .
+RUN pip install --process-dependency-links -e.
