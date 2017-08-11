@@ -9,13 +9,9 @@ import yaml
 import requests
 import time
 
-
 import socketio
-
-
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
-
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, session, url_for
 
 
@@ -204,8 +200,6 @@ def backendstatusview():
     job_info = [{'jobguid': k, 'details': v} for k,v in recastbackend.jobdb.jobs_details(recastbackend.jobdb.all_jobs()).iteritems()]
     return render_template('job_status.html', job_info = job_info)
 
-
-
 def background_thread():
     """Example of how to send server generated events to clients."""
     log.info('starting background thread')
@@ -233,7 +227,6 @@ def enter(sid, data):
     states = wflowapi.get_workflow_messages(data['room'],topic = 'state')
     try:
         sio.emit('room_msg', states[-1], room=sid, namespace='/wflow')
-        print 'STATTTTEEE',states[-1]
     except IndexError:
         pass
 
