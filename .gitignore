@@ -1,3 +1,4 @@
 **.pyc
 *.egg-info
 recastcontrolcenter/static/bower_components
+dist
