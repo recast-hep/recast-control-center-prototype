@@ -4,8 +4,10 @@ import zipfile
 from flask import Blueprint, render_template, jsonify, request, session
 from recastbackend.catalogue import recastcatalogue
 import recastbackend.resultextraction
+import recastbackend.resultaccess
 from recastbackend.jobdb import get_flattened_jobs
 
+import itertools
 import logging
 log = logging.getLogger(__name__)
 
@@ -24,24 +26,38 @@ def recast_request_view(reqid):
 
     parpoints = recastapi.request.read.point_request_of_scan(reqid)
     point_coordinates = {
-        p['id']: {c['title']:c['value'] for c in p['point_coordinates']}
-        for p in parpoints
+        p['id']: {c['title']:c['value'] for c in p['point_coordinates']} for p in parpoints
     }
 
-    basic_req_data = {
-        p['id']: p['requests']
-        for p in parpoints
-    }
+    basic_req_data = {p['id']: p['requests'] for p in parpoints}
 
 
-    print recastcatalogue()
+
     wflow_configs = recastcatalogue().get(int(analysis_id), {})
 
-    print wflow_configs,"HHUHUH"
+
     processing_info = {}
+    result_info = {}
+    average_results = {}
     for k, v in basic_req_data.iteritems():
         for basic_req in v:
             processing_info[basic_req['id']] = get_flattened_jobs(basic_req['id'], wflow_configs.keys())
+            for wc in wflow_configs.keys():
+                result = recastbackend.resultaccess.resultdata(analysis_id,wc,basic_req['id'])
+
+                result_info.setdefault(basic_req['id'],{})[wc] = result
+                if result and result['observed_CLs'] and result['expected_CLs']:
+                    average_results.setdefault(k,[]).append([result['observed_CLs'],result['expected_CLs']])
+
+        if k in average_results:
+            average_results[k] = [sum(x)/len(x) for x in zip(*average_results[k]) ]
+        else:
+            average_results[k] = [None,None]
+
+
+    basic_reqs_by_format = {}
+    for br in itertools.chain(*basic_req_data.values()):
+        basic_reqs_by_format.setdefault(br['request_format'],[]).append(br['id'])
 
     visdata = {
         'data': [
@@ -55,13 +71,22 @@ def recast_request_view(reqid):
 
     for i,p in enumerate(parpoints):
         pd = {}
-        pd.update(global_pr_id = p['id'], scan_pr_id=i, **point_coordinates[p['id']])
+        pd.update(
+            global_pr_id = p['id'],
+            scan_pr_id=i,
+            avg_obs = average_results[p['id']][0],
+            avg_exp = average_results[p['id']][1],
+            **point_coordinates[p['id']]
+        )
         visdata['data'][0]['values'].append(pd)
         
     log.info('proc info is %s', processing_info)
     return render_template('recast_request.html',
                             request_info=request_info,
                             visdata = visdata,
+                            basic_reqs_by_format = basic_reqs_by_format,
+                            average_results = average_results,
+                            result_info = result_info,
                             point_coordinates = point_coordinates,
                             parpoints=enumerate(parpoints),
                             basic_req_data=basic_req_data,
@@ -99,6 +124,8 @@ def recast_requests_view():
                            requests_info = reversed(requests_info),
                            wflow_config_data = wflow_config_data
                            )
+
+
 
 @recast.route('/processBasicRequest', methods=['GET'])
 def process_request_point():

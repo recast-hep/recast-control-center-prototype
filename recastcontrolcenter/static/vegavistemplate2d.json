@@ -19,6 +19,11 @@
 			"signal": "ordinate"
 		}
 	}],
+	"legends": [{
+		"fill": "Cls_scale",
+		"type": "gradient",
+		"orient": "bottom"
+	}],
 	"signals": [{
 		"bind": {
 			"input": "select",
@@ -58,6 +63,13 @@
 					"value": 1.0
 				}, {
 					"value": 0.0
+				}],
+				"fill": [{
+					"test": "datum.avg_obs != null && datum.avg_exp != null",
+					"field": "avg_obs",
+					"scale": "Cls_scale"				
+				}, {
+					"value": "grey"
 				}]
 			},
 			"enter": {
@@ -81,9 +93,6 @@
 				},
 				"size": {
 					"value": 100
-				},
-				"fill": {
-					"value": "steelblue"
 				}
 			}
 		},
@@ -112,6 +121,11 @@
 	}],
 	"$schema": "https://vega.github.io/schema/vega/v3.0.json",
 	"scales": [{
+		"domain": [0.0001,1],
+		"name": "Cls_scale",
+		"type": "log",
+        "range": "heatmap"
+	},{
 		"domain": {
 			"field": {
 				"signal": "abcissa"
@@ -137,6 +151,17 @@
 		"type": "linear",
 		"nice": true
 	}],
-	"data": [],
+	"data": [
+	    {
+	      "name": "pointrequests_with_results",
+	      "source": "pointrequests",
+	      "transform": [
+	        {
+	          "type": "filter",
+	          "expr": "datum.avg_obs != null && datum.avg_exp != null"
+	        }
+	      ]
+	    }
+	],
 	"height": 350
 }

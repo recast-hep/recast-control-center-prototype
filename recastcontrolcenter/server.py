@@ -180,6 +180,9 @@ for resultviewconfig in backendconfig['blueprintconfig']:
         resultviewconfig['prefix']
     ))
 
+@flask_app.route('/recastresult/<analysisid>/<wflowconfigname>/<basicreqid>')
+def resultdata(analysisid,wflowconfigname,basicreqid):
+    return jsonify(recastbackend.resultaccess.resultdata(analysisid,wflowconfigname,basicreqid))
 
 from recastbackend.catalogue import recastcatalogue
 default_views_for_plugin = {x['plugin']: x['blueprint'] for x in backendconfig['defaultviews']}

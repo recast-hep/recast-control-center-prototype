@@ -51,9 +51,11 @@
 
 var vega_req_data = {{visdata|tojson|safe}}
 
+var br_by_format = {{basic_reqs_by_format|tojson|safe}}
+
 if(vega_req_data.pars.length > 1){
   $.get('/static/vegavistemplate2d.json',function(visdata){
-    visdata.data = vega_req_data.data
+    visdata.data = vega_req_data.data.concat(visdata.data)
     visdata.signals[0].bind.options = vega_req_data.pars
     visdata.signals[1].bind.options = vega_req_data.pars
     runview2d(vega_req_data.pars[0],vega_req_data.pars[1],visdata)
@@ -61,21 +63,44 @@ if(vega_req_data.pars.length > 1){
 }
 else{
   $.get('/static/vegavistemplate1d.json',function(visdata){
-    visdata.data = vega_req_data.data
+    visdata.data = visdata.data.concat(vega_req_data.data)
     visdata.signals[0].bind.options = vega_req_data.pars
     runview1d(vega_req_data.pars[0],visdata)
   })
 
 }
-</script>
 
-<script type="text/javascript">
 $(document).ready(function(){
     $('.process-all-btn').click(function(){
         var button = $(this);
         wflowconfig = button.attr('data-wflowconfig')
+        format = button.attr('data-wflowconfig-format')
 
-        console.log('processing all basic requests with config X')
+
+        console.log('processing all basic requests with')
+        console.log(format)
+        console.log(wflowconfig)
+        brs = br_by_format[format]
+        console.log(brs)
+
+        brs.forEach(function(val,index){
+
+          url = location.origin+'/recast/processBasicRequest?'+$.param({
+            analysisid: {{request_info['analysis_id']}},
+            wflowconfig: wflowconfig,
+            basicreqid: val
+          })
+
+
+          $.ajax(url,{
+              complete: function(data){
+                  var jobguid = data['responseJSON']['jobguid']
+                  console.log(data['responseJSON'])
+                  console.log('for br ' + val + ' got jobguid: '+jobguid)
+              }
+          })
+
+        })
     })
 
     $('.process-btn').click(function(){
@@ -167,6 +192,8 @@ $(document).ready(function(){
     {% endif %}
 
 
+
+
     $('.upload-response-btn').click(function(){
       var button = $(this)
       $.ajax(location.origin+'/recast/uploadPointResponse?'+$.param({
@@ -202,6 +229,8 @@ function togglejobs(basicreqid){
     <h1>Recast Scan Request <small>{{request_info['title']}}</small></h1>
 </div>
 
+
+
 <div class="row">
     <div class="col-md-6">
         <div class="panel panel-primary">
@@ -227,7 +256,6 @@ function togglejobs(basicreqid){
     </div>
 </div> <!-- row -->
 
-
 <div class="row">
 </div>
 <div class="btn-group process-all-group">
@@ -235,6 +263,16 @@ function togglejobs(basicreqid){
     Process All <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
+    {% for wc,wc_details in wflow_configs.iteritems() %}
+      {% set points_for_this = basic_reqs_by_format.get(wc_details['request_format'],[]) %}
+      {% if points_for_this|length > 0 %}
+      <li>
+        <a href="#" class="btn btn-xs process-all-btn" data-wflowconfig-format="{{wc_details['request_format']}}" data-wflowconfig="{{wc}}">
+        {{wc}} ({{wc_details['request_format']}} , {{basic_reqs_by_format.get(wc_details['request_format'],[])|length}} pts)
+        </a>
+      </li>
+      {% endif %}
+    {% endfor %}
   </ul>
 </div>
 
@@ -256,6 +294,10 @@ function togglejobs(basicreqid){
           {% for k,v in point_coordinates[pp['id']].iteritems() %}
           <span class="label label-default">{{k}}: {{v}}</span>
           {% endfor %}
+          {% if average_results[pp['id']][0] and average_results[pp['id']][1] %}
+          <span class="label label-default">{{ 'obs: %0.2f' | format(average_results[pp['id']][0]) }}</span>
+          <span class="label label-default">{{ 'exp: %0.2f' | format(average_results[pp['id']][1]) }}</span>
+          {% endif %}
         </div>
         <div id="collapse_{{loop.index}}" class="panel-collapse collapse {{'%s' % 'in' if loop.index == 1}}" role="tabpanel" aria-labelledby="heading_{{loop.index}}">
           <div class="panel-body">
@@ -294,7 +336,12 @@ function togglejobs(basicreqid){
                       </button>
                       <ul class="dropdown-menu" role="menu">
                       {% for wc in wflow_configs.keys() %}
-                        <li><a href="/resultview/{{request_info['analysis_id']}}/{{wc}}/{{br['id']}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}</a></li>
+                        <li>
+                        <a href="/resultview/{{request_info['analysis_id']}}/{{wc}}/{{br['id']}}" class="btn btn-xs result-btn" data-basic-req-id="{{br['id']}}" data-wflowconfig="{{wc}}">{{wc}}
+                        {% if result_info[br['id']][wc] %}
+                        ({{ '%.02f|%.02f' | format( result_info[br['id']][wc]['observed_CLs'], result_info[br['id']][wc]['expected_CLs'] ) }})
+                        {% endif %}
+                        </a></li>
                       {% endfor %}
                       </ul>
                     </div>
