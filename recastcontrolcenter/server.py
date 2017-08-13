@@ -198,6 +198,11 @@ def resultview(basicreqid, analysisid, wflowconfigname):
 def monitorview(workflow_id):
     return render_template('monitor.html', workflow_id=workflow_id)
 
+@flask_app.route('/subjob_monitor/<identifier>')
+def subjob_monitor(identifier):
+    return render_template('subjobmonitor.html', subjobid = identifier)
+
+
 @flask_app.route('/backend')
 def backendstatusview():
     job_info = [{'jobguid': k, 'details': v} for k,v in recastbackend.jobdb.jobs_details(recastbackend.jobdb.all_jobs()).iteritems()]
@@ -222,7 +227,6 @@ def background_thread():
 def connect(sid, environ):
     print('Client connected to /wflow')
 
-
 @sio.on('join', namespace='/wflow')
 def enter(sid, data):
     print('data', data)
@@ -231,6 +235,7 @@ def enter(sid, data):
     try:
         sio.emit('room_msg', states[-1], room=sid, namespace='/wflow')
     except IndexError:
+        log.info('no hisotrical messages for %s', data['room'])
         pass
 
     stored_messages = wflowapi.get_workflow_messages(data['room'], topic = 'log')
@@ -250,3 +255,13 @@ def disconnect(sid):
     print('Client disconnected')
 
 
+@sio.on('join', namespace='/subjobmon')
+def enter_sub(sid,data):
+    historical_data = wflowapi.subjob_messages(data['room'], topic = 'run')
+    # for this session, emit historical data
+    for msg in historical_data[-3000:]:
+        sio.emit('log_message',msg, room = sid, namespace = '/subjobmon')
+
+    #subscribe to any future updates
+    sio.enter_room(sid, data['room'], namespace='/subjobmon')
+# 
