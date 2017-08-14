@@ -144,7 +144,7 @@
 	  "name": "ClsThr",
 	  "type": "threshold",
 	  "domain": [0, 0.05, 1.0],
-	  "range": ["blue", "red", "green","blue"]
+	  "range": ["red", "red", "green","green"]
 	},
 	{
 		"domain": {
