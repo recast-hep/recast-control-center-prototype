@@ -31,10 +31,7 @@ def recast_request_view(reqid):
 
     basic_req_data = {p['id']: p['requests'] for p in parpoints}
 
-
-
     wflow_configs = recastcatalogue().get(int(analysis_id), {})
-
 
     processing_info = {}
     result_info = {}
@@ -53,7 +50,6 @@ def recast_request_view(reqid):
             average_results[k] = [sum(x)/len(x) for x in zip(*average_results[k]) ]
         else:
             average_results[k] = [None,None]
-
 
     basic_reqs_by_format = {}
     for br in itertools.chain(*basic_req_data.values()):
