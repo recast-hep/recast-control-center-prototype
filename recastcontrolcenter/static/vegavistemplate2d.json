@@ -20,7 +20,7 @@
 		}
 	}],
 	"legends": [{
-		"fill": "Cls_scale",
+		"fill": "ClsHeat",
 		"type": "gradient",
 		"orient": "bottom"
 	}],
@@ -31,14 +31,26 @@
 		},
 		"name": "abcissa",
 		"value": null
-	}, {
+	},
+	 {
 		"bind": {
 			"input": "select",
 			"options": null
 		},
 		"name": "ordinate",
 		"value": null
-	}, {
+	}, 
+
+    {
+		"bind": {
+			"input": "select",
+			"options": ["ClsHeat","ClsThr"]
+		},
+		"name": "colormap",
+		"value": "ClsHeat"
+	},
+
+	{
 		"bind": {
 			"input": "checkbox"
 		},
@@ -53,6 +65,7 @@
       "name": "explode",
       "value": 0
     }
+
 	],
 	"marks": [{
 		"encode": {
@@ -67,7 +80,7 @@
 				"fill": [{
 					"test": "datum.avg_obs != null && datum.avg_exp != null",
 					"field": "avg_obs",
-					"scale": "Cls_scale"				
+					"scale": {"signal":"colormap"}				
 				}, {
 					"value": "grey"
 				}]
@@ -120,12 +133,20 @@
 		}]
 	}],
 	"$schema": "https://vega.github.io/schema/vega/v3.0.json",
-	"scales": [{
+	"scales": [
+	{
 		"domain": [0.0001,1],
-		"name": "Cls_scale",
+		"name": "ClsHeat",
 		"type": "log",
         "range": "heatmap"
-	},{
+	},
+	{
+	  "name": "ClsThr",
+	  "type": "threshold",
+	  "domain": [0, 0.05, 1.0],
+	  "range": ["blue", "red", "green","blue"]
+	},
+	{
 		"domain": {
 			"field": {
 				"signal": "abcissa"
