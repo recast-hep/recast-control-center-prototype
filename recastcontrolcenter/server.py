@@ -89,7 +89,7 @@ def extract_user_info(userdata):
     egroup_to_expt = {
         'cms-members': 'CMS',
         'alice-member': 'ALICE',
-        'atlas-active-physicists': 'ATLAS',
+        'atlas-current-physicists': 'ATLAS',
         'lhcb-general': 'LHCb'
     }
 
